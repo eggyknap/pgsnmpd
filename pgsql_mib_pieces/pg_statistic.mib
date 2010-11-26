@@ -1,0 +1,221 @@
+pgsqlPgStatisticTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgStatisticEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_statistic stores statistical data about the contents of the database. Entries are created by ANALYZE and subsequently used by the query planner. There is one entry for each table column that has been analyzed. Note that all the statistical data is inherently approximate, even assuming that it is up-to-date. pg_statistic also stores statistical data about the values of index expressions. These are described as if they were actual data columns; in particular, starelid references the index. No entry is made for an ordinary non-expression index column, however, since it would be redundant with the entry for the underlying table column. Since different kinds of statistics may be appropriate for different kinds of data, pg_statistic is designed not to assume very much about what sort of statistics it stores. Only extremely general statistics (such as nullness) are given dedicated columns in pg_statistic. Everything else is stored in 'slots', which are groups of associated columns whose content is identified by a code number in one of the slot's columns. For more information see src/include/catalog/pg_statistic.h. pg_statistic should not be readable by the public, since even statistical information about a table's contents may be considered sensitive. (Example: minimum and maximum values of a salary column might be quite interesting.) pg_stats is a publicly readable view on pg_statistic that only exposes information about those tables that are readable by the current user."
+	::= { pgsqlCatalogTables 30 }
+
+pgsqlPgStatisticEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgStatisticEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents statistics data for a single column"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgStatisticEntryOID }
+	::= { pgsqlPgStatisticTable 1 }
+
+PgsqlPgStatisticEntry ::=
+	SEQUENCE {
+		pgsqlPgStatisticEntryOID		INTEGER,
+		pgsqlPgStatisticStarelid		INTEGER,
+		pgsqlPgStatisticStaattnum		INTEGER,
+		pgsqlPgStatisticStanullfrac		Float,
+		pgsqlPgStatisticStawidth		INTEGER,
+		pgsqlPgStatisticStadistinct		Float,
+		pgsqlPgStatisticStakind1		INTEGER,
+		pgsqlPgStatisticStakind2		INTEGER,
+		pgsqlPgStatisticStakind3		INTEGER,
+		pgsqlPgStatisticStakind4		INTEGER,
+		pgsqlPgStatisticStaop1		INTEGER,
+		pgsqlPgStatisticStaop2		INTEGER,
+		pgsqlPgStatisticStaop3		INTEGER,
+		pgsqlPgStatisticStaop4		INTEGER,
+		pgsqlPgStatisticStanumbers1		DisplayString,
+		pgsqlPgStatisticStanumbers2		DisplayString,
+		pgsqlPgStatisticStanumbers3		DisplayString,
+		pgsqlPgStatisticStanumbers4		DisplayString,
+		pgsqlPgStatisticStavalues1		DisplayString,
+		pgsqlPgStatisticStavalues2		DisplayString,
+		pgsqlPgStatisticStavalues3		DisplayString,
+		pgsqlPgStatisticStavalues4		DisplayString
+	}
+
+pgsqlPgStatisticEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgStatisticEntry 1 }
+
+pgsqlPgStatisticStarelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table or index that the described column belongs to"
+	::= { pgsqlPgStatisticEntry 2 }
+
+pgsqlPgStatisticStaattnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the described column"
+	::= { pgsqlPgStatisticEntry 3 }
+
+pgsqlPgStatisticStanullfrac			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The fraction of the column's entries that are null"
+	::= { pgsqlPgStatisticEntry 4 }
+
+pgsqlPgStatisticStawidth			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The average stored width, in bytes, of nonnull entries"
+	::= { pgsqlPgStatisticEntry 5 }
+
+pgsqlPgStatisticStadistinct			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of distinct nonnull data values in the column. A value greater than zero is the actual number of distinct values. A value less than zero is the negative of a fraction of the number of rows in the table (for example, a column in which values appear about twice on the average could be represented by stadistinct = -0.5). A zero value means the number of distinct values is unknown"
+	::= { pgsqlPgStatisticEntry 6 }
+
+pgsqlPgStatisticStakind1			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 1st 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 7 }
+
+pgsqlPgStatisticStakind2			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 2nd 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 8 }
+
+pgsqlPgStatisticStakind3			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 3rd 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 9 }
+
+pgsqlPgStatisticStakind4			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 4th 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 10 }
+
+pgsqlPgStatisticStaop1			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 1st 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 11 }
+
+pgsqlPgStatisticStaop2			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 2nd 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 12 }
+
+pgsqlPgStatisticStaop3			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 3rd 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 13 }
+
+pgsqlPgStatisticStaop4			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 4th 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 14 }
+
+pgsqlPgStatisticStanumbers1			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 1st 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 15 }
+
+pgsqlPgStatisticStanumbers2			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 2nd 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 16 }
+
+pgsqlPgStatisticStanumbers3			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 3rd 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 17 }
+
+pgsqlPgStatisticStanumbers4			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 4th 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 18 }
+
+pgsqlPgStatisticStavalues1			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 1st 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 19 }
+
+pgsqlPgStatisticStavalues2			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 2nd 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 20 }
+
+pgsqlPgStatisticStavalues3			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 3rd 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 21 }
+
+pgsqlPgStatisticStavalues4			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 4th 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 22 }
+
+
+---------------------------------------

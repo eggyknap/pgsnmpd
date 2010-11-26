@@ -1,0 +1,6 @@
+pg_ts_template	"The pg_ts_template catalog contains entries defining text search templates. A template is the implementation skeleton for a class of text search dictionaries. Since a template must be implemented by C-language-level functions, creation of new templates is restricted to database superusers."	"pg_ts_template entry"	pgsqlCatalogTables	40	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+tmplname	DisplayString	 Text search template name
+tmplnamespace	INTEGER	The OID of the namespace that contains this template
+tmplinit	INTEGER	OID of the template's initialization function
+tmpllexize	INTEGER	OID of the template's lexize function

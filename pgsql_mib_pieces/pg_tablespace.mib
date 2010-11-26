@@ -1,0 +1,68 @@
+pgsqlPgTablespaceTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTablespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_tablespace stores information about the available tablespaces. Tables can be placed in particular tablespaces to aid administration of disk layout. Unlike most system catalogs, pg_tablespace is shared across all databases of a cluster: there is only one copy of pg_tablespace per cluster, not one per database."
+	::= { pgsqlCatalogTables 31 }
+
+pgsqlPgTablespaceEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTablespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single tablespace"
+	INDEX  { pgsnmpdConnID, pgsqlPgTablespaceEntryOID }
+	::= { pgsqlPgTablespaceTable 1 }
+
+PgsqlPgTablespaceEntry ::=
+	SEQUENCE {
+		pgsqlPgTablespaceEntryOID		INTEGER,
+		pgsqlPgTablespaceSpcname		DisplayString,
+		pgsqlPgTablespaceSpcowner		INTEGER,
+		pgsqlPgTablespaceSpclocation		DisplayString,
+		pgsqlPgTablespaceSpcacl		DisplayString
+	}
+
+pgsqlPgTablespaceEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTablespaceEntry 1 }
+
+pgsqlPgTablespaceSpcname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Tablespace name"
+	::= { pgsqlPgTablespaceEntry 2 }
+
+pgsqlPgTablespaceSpcowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the tablespace, usually the user who created it"
+	::= { pgsqlPgTablespaceEntry 3 }
+
+pgsqlPgTablespaceSpclocation			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Location (directory path) of the tablespace"
+	::= { pgsqlPgTablespaceEntry 4 }
+
+pgsqlPgTablespaceSpcacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgTablespaceEntry 5 }
+
+
+---------------------------------------

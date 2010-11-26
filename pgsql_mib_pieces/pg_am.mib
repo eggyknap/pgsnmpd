@@ -1,0 +1,239 @@
+pgsqlPgAmTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_am stores information about index access methods. There is one row for each index access method supported by the system."
+	::= { pgsqlCatalogTables 2 }
+
+pgsqlPgAmEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An access method"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmEntryOID }
+	::= { pgsqlPgAmTable 1 }
+
+PgsqlPgAmEntry ::=
+	SEQUENCE {
+		pgsqlPgAmEntryOID		INTEGER,
+		pgsqlPgAmAmname		DisplayString,
+		pgsqlPgAmAmstrategies		INTEGER,
+		pgsqlPgAmAmsupport		INTEGER,
+		pgsqlPgAmAmorderstrategy		INTEGER,
+		pgsqlPgAmAmcanunique		TruthValue,
+		pgsqlPgAmAmcanmulticol		TruthValue,
+		pgsqlPgAmAmoptionalkey		TruthValue,
+		pgsqlPgAmAmindexnulls		TruthValue,
+		pgsqlPgAmAmstorage		TruthValue,
+		pgsqlPgAmAmclusterable		TruthValue,
+		pgsqlPgAmAminsert		INTEGER,
+		pgsqlPgAmAmbeginscan		INTEGER,
+		pgsqlPgAmAmgettuple		INTEGER,
+		pgsqlPgAmAmgetmulti		INTEGER,
+		pgsqlPgAmAmrescan		INTEGER,
+		pgsqlPgAmAmendscan		INTEGER,
+		pgsqlPgAmAmmarkpos		INTEGER,
+		pgsqlPgAmAmrestrpos		INTEGER,
+		pgsqlPgAmAmbuild		INTEGER,
+		pgsqlPgAmAmbulkdelete		INTEGER,
+		pgsqlPgAmAmvacuumcleanup		INTEGER,
+		pgsqlPgAmAmcostestimate		INTEGER,
+		pgsqlPgAmAmoptions		INTEGER
+	}
+
+pgsqlPgAmEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmEntry 1 }
+
+pgsqlPgAmAmname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the access method"
+	::= { pgsqlPgAmEntry 2 }
+
+pgsqlPgAmAmstrategies			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of operator strategies for this access method"
+	::= { pgsqlPgAmEntry 3 }
+
+pgsqlPgAmAmsupport			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of support routines for this access method"
+	::= { pgsqlPgAmEntry 4 }
+
+pgsqlPgAmAmorderstrategy			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Zero if the index offers no sort order, otherwise the strategy number of the strategy operator that describes the sort order"
+	::= { pgsqlPgAmEntry 5 }
+
+pgsqlPgAmAmcanunique			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support unique indexes?"
+	::= { pgsqlPgAmEntry 6 }
+
+pgsqlPgAmAmcanmulticol			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support multicolumn indexes?"
+	::= { pgsqlPgAmEntry 7 }
+
+pgsqlPgAmAmoptionalkey			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support a scan without any constraint for the first index column?"
+	::= { pgsqlPgAmEntry 8 }
+
+pgsqlPgAmAmindexnulls			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support null index entries?"
+	::= { pgsqlPgAmEntry 9 }
+
+pgsqlPgAmAmstorage			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Can index storage data type differ from column data type?"
+	::= { pgsqlPgAmEntry 10 }
+
+pgsqlPgAmAmclusterable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Can an index of this type be clustered on?"
+	::= { pgsqlPgAmEntry 11 }
+
+pgsqlPgAmAminsert			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Insert this tuple"
+	::= { pgsqlPgAmEntry 12 }
+
+pgsqlPgAmAmbeginscan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start new scan"
+	::= { pgsqlPgAmEntry 13 }
+
+pgsqlPgAmAmgettuple			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Next valid tuple"
+	::= { pgsqlPgAmEntry 14 }
+
+pgsqlPgAmAmgetmulti			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Fetch multiple tuples"
+	::= { pgsqlPgAmEntry 15 }
+
+pgsqlPgAmAmrescan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restart this scan"
+	::= { pgsqlPgAmEntry 16 }
+
+pgsqlPgAmAmendscan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"End this scan"
+	::= { pgsqlPgAmEntry 17 }
+
+pgsqlPgAmAmmarkpos			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Mark current scan position"
+	::= { pgsqlPgAmEntry 18 }
+
+pgsqlPgAmAmrestrpos			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restore marked scan position"
+	::= { pgsqlPgAmEntry 19 }
+
+pgsqlPgAmAmbuild			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Build new index"
+	::= { pgsqlPgAmEntry 20 }
+
+pgsqlPgAmAmbulkdelete			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Bulk-delete function"
+	::= { pgsqlPgAmEntry 21 }
+
+pgsqlPgAmAmvacuumcleanup			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Post- VACUUM cleanup function"
+	::= { pgsqlPgAmEntry 22 }
+
+pgsqlPgAmAmcostestimate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function to estimate cost of an index scan"
+	::= { pgsqlPgAmEntry 23 }
+
+pgsqlPgAmAmoptions			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function to parse and validate reloptions for an index"
+	::= { pgsqlPgAmEntry 24 }
+
+
+---------------------------------------

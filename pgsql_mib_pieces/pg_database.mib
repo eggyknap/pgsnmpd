@@ -1,0 +1,132 @@
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgDatabaseTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgDatabaseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_database stores information about the available databases. Databases are created with the CREATE DATABASE command. Unlike most system catalogs, pg_database is shared across all databases of a cluster: there is only one copy of pg_database per cluster, not one per database."
+	::= { pgsqlCatalogTables 14 }
+
+pgsqlPgDatabaseEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgDatabaseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A database"
+	INDEX  { pgsnmpdConnID, pgsqlPgDatabaseEntryOID }
+	::= { pgsqlPgDatabaseTable 1 }
+
+PgsqlPgDatabaseEntry ::=
+	SEQUENCE {
+		pgsqlPgDatabaseEntryOID		INTEGER,
+		pgsqlPgDatabaseDatname		DisplayString,
+		pgsqlPgDatabaseDatdba		INTEGER,
+		pgsqlPgDatabaseEncoding		INTEGER,
+		pgsqlPgDatabaseDatistemplate		TruthValue,
+		pgsqlPgDatabaseDatallowconn		TruthValue,
+		pgsqlPgDatabaseDatconnlimit		INTEGER,
+		pgsqlPgDatabaseDatlastsysoid		INTEGER,
+		pgsqlPgDatabaseDatfrozenxid		INTEGER,
+		pgsqlPgDatabaseDattablespace		INTEGER,
+		pgsqlPgDatabaseDatconfig		DisplayString,
+		pgsqlPgDatabaseDatacl		DisplayString
+	}
+
+pgsqlPgDatabaseEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgDatabaseEntry 1 }
+
+pgsqlPgDatabaseDatname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Database name"
+	::= { pgsqlPgDatabaseEntry 2 }
+
+pgsqlPgDatabaseDatdba			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the database, usually the user who created it"
+	::= { pgsqlPgDatabaseEntry 3 }
+
+pgsqlPgDatabaseEncoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Character encoding for this database ( pg_encoding_to_char() can translate this number to the encoding name)"
+	::= { pgsqlPgDatabaseEntry 4 }
+
+pgsqlPgDatabaseDatistemplate			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true then this database can be used in the TEMPLATE clause of CREATE DATABASE to create a new database as a clone of this one"
+	::= { pgsqlPgDatabaseEntry 5 }
+
+pgsqlPgDatabaseDatallowconn			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If false then no one can connect to this database. This is used to protect the template0 database from being altered"
+	::= { pgsqlPgDatabaseEntry 6 }
+
+pgsqlPgDatabaseDatconnlimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sets maximum number of concurrent connections that can be made to this database. -1 means no limit"
+	::= { pgsqlPgDatabaseEntry 7 }
+
+pgsqlPgDatabaseDatlastsysoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Last system OID in the database; useful particularly to pg_dump"
+	::= { pgsqlPgDatabaseEntry 8 }
+
+pgsqlPgDatabaseDatfrozenxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"All transaction IDs before this one have been replaced with a permanent ( "
+	::= { pgsqlPgDatabaseEntry 9 }
+
+pgsqlPgDatabaseDattablespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The default tablespace for the database. Within this database, all tables for which pg_class . reltablespace is zero will be stored in this tablespace; in particular, all the non-shared system catalogs will be there"
+	::= { pgsqlPgDatabaseEntry 10 }
+
+pgsqlPgDatabaseDatconfig			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Session defaults for run-time configuration variables"
+	::= { pgsqlPgDatabaseEntry 11 }
+
+pgsqlPgDatabaseDatacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgDatabaseEntry 12 }
+
+
+---------------------------------------

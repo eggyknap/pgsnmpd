@@ -1,0 +1,122 @@
+pgsqlPgAutovacuumTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAutovacuumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_autovacuum stores optional per-relation configuration parameters for the autovacuum daemon. If there is an entry here for a particular relation, the given parameters will be used for autovacuuming that table. If no entry is present, the system-wide defaults will be used."
+	::= { pgsqlCatalogTables 9 }
+
+pgsqlPgAutovacuumEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAutovacuumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Autovacuum settings for a relation"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAutovacuumEntryOID }
+	::= { pgsqlPgAutovacuumTable 1 }
+
+PgsqlPgAutovacuumEntry ::=
+	SEQUENCE {
+		pgsqlPgAutovacuumEntryOID		INTEGER,
+		pgsqlPgAutovacuumVacrelid		INTEGER,
+		pgsqlPgAutovacuumEnabled		TruthValue,
+		pgsqlPgAutovacuumVacBaseThresh		INTEGER,
+		pgsqlPgAutovacuumVacScaleFactor		Float,
+		pgsqlPgAutovacuumAnlBaseThresh		INTEGER,
+		pgsqlPgAutovacuumAnlScaleFactor		Float,
+		pgsqlPgAutovacuumVacCostDelay		INTEGER,
+		pgsqlPgAutovacuumVacCostLimit		INTEGER,
+		pgsqlPgAutovacuumFreezeMinAge		INTEGER,
+		pgsqlPgAutovacuumFreezeMaxAge		INTEGER
+	}
+
+pgsqlPgAutovacuumEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAutovacuumEntry 1 }
+
+pgsqlPgAutovacuumVacrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this entry is for"
+	::= { pgsqlPgAutovacuumEntry 2 }
+
+pgsqlPgAutovacuumEnabled			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If false, this table is never autovacuumed"
+	::= { pgsqlPgAutovacuumEntry 3 }
+
+pgsqlPgAutovacuumVacBaseThresh			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Minimum number of modified tuples before vacuum"
+	::= { pgsqlPgAutovacuumEntry 4 }
+
+pgsqlPgAutovacuumVacScaleFactor			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Multiplier for reltuples to add to vac_base_thresh"
+	::= { pgsqlPgAutovacuumEntry 5 }
+
+pgsqlPgAutovacuumAnlBaseThresh			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Minimum number of modified tuples before analyze"
+	::= { pgsqlPgAutovacuumEntry 6 }
+
+pgsqlPgAutovacuumAnlScaleFactor			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Multiplier for reltuples to add to anl_base_thresh"
+	::= { pgsqlPgAutovacuumEntry 7 }
+
+pgsqlPgAutovacuumVacCostDelay			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_cost_delay parameter"
+	::= { pgsqlPgAutovacuumEntry 8 }
+
+pgsqlPgAutovacuumVacCostLimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_cost_limit parameter"
+	::= { pgsqlPgAutovacuumEntry 9 }
+
+pgsqlPgAutovacuumFreezeMinAge			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_freeze_min_age parameter"
+	::= { pgsqlPgAutovacuumEntry 10 }
+
+pgsqlPgAutovacuumFreezeMaxAge			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom autovacuum_freeze_max_age parameter"
+	::= { pgsqlPgAutovacuumEntry 11 }
+
+
+---------------------------------------

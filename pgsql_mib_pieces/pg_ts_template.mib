@@ -1,0 +1,68 @@
+pgsqlPgTsTemplateTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsTemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_template catalog contains entries defining text search templates. A template is the implementation skeleton for a class of text search dictionaries. Since a template must be implemented by C-language-level functions, creation of new templates is restricted to database superusers."
+	::= { pgsqlCatalogTables 40 }
+
+pgsqlPgTsTemplateEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsTemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_template entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsTemplateEntryOID }
+	::= { pgsqlPgTsTemplateTable 1 }
+
+PgsqlPgTsTemplateEntry ::=
+	SEQUENCE {
+		pgsqlPgTsTemplateEntryOID		INTEGER,
+		pgsqlPgTsTemplateTmplname		DisplayString,
+		pgsqlPgTsTemplateTmplnamespace		INTEGER,
+		pgsqlPgTsTemplateTmplinit		INTEGER,
+		pgsqlPgTsTemplateTmpllexize		INTEGER
+	}
+
+pgsqlPgTsTemplateEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsTemplateEntry 1 }
+
+pgsqlPgTsTemplateTmplname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" Text search template name"
+	::= { pgsqlPgTsTemplateEntry 2 }
+
+pgsqlPgTsTemplateTmplnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this template"
+	::= { pgsqlPgTsTemplateEntry 3 }
+
+pgsqlPgTsTemplateTmplinit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the template's initialization function"
+	::= { pgsqlPgTsTemplateEntry 4 }
+
+pgsqlPgTsTemplateTmpllexize			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the template's lexize function"
+	::= { pgsqlPgTsTemplateEntry 5 }
+
+
+---------------------------------------

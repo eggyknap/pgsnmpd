@@ -1,0 +1,59 @@
+pgsqlPgListenerTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgListenerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_listener supports the LISTEN and NOTIFY commands. A listener creates an entry in pg_listener for each notification name it is listening for. A notifier scans pg_listener and updates each matching entry to show that a notification has occurred. The notifier also sends a signal (using the PID recorded in the table) to awaken the listener from sleep."
+	::= { pgsqlCatalogTables 21 }
+
+pgsqlPgListenerEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgListenerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single listener"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgListenerEntryOID }
+	::= { pgsqlPgListenerTable 1 }
+
+PgsqlPgListenerEntry ::=
+	SEQUENCE {
+		pgsqlPgListenerEntryOID		INTEGER,
+		pgsqlPgListenerRelname		DisplayString,
+		pgsqlPgListenerListenerpid		INTEGER,
+		pgsqlPgListenerNotification		INTEGER
+	}
+
+pgsqlPgListenerEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgListenerEntry 1 }
+
+pgsqlPgListenerRelname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Notify condition name. (The name need not match any actual relation in the database; the name relname is historical.)"
+	::= { pgsqlPgListenerEntry 2 }
+
+pgsqlPgListenerListenerpid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"PID of the server process that created this entry"
+	::= { pgsqlPgListenerEntry 3 }
+
+pgsqlPgListenerNotification			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Zero if no event is pending for this listener. If an event is pending, the PID of the server process that sent the notification."
+	::= { pgsqlPgListenerEntry 4 }
+
+
+---------------------------------------

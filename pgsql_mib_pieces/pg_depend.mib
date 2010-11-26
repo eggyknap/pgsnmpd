@@ -1,0 +1,95 @@
+pgsqlPgDependTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgDependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_depend records the dependency relationships between database objects. This information allows DROP commands to find which other objects must be dropped by DROP CASCADE or prevent dropping in the DROP RESTRICT case. See also pg_shdepend, which performs a similar function for dependencies involving objects that are shared across a database cluster."
+	::= { pgsqlCatalogTables 15 }
+
+pgsqlPgDependEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgDependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Dependancy entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgDependEntryOID }
+	::= { pgsqlPgDependTable 1 }
+
+PgsqlPgDependEntry ::=
+	SEQUENCE {
+		pgsqlPgDependEntryOID		INTEGER,
+		pgsqlPgDependClassid		INTEGER,
+		pgsqlPgDependObjid		INTEGER,
+		pgsqlPgDependObjsubid		INTEGER,
+		pgsqlPgDependRefclassid		INTEGER,
+		pgsqlPgDependRefobjid		INTEGER,
+		pgsqlPgDependRefobjsubid		INTEGER,
+		pgsqlPgDependDeptype		char
+	}
+
+pgsqlPgDependEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgDependEntry 1 }
+
+pgsqlPgDependClassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the dependent object is in"
+	::= { pgsqlPgDependEntry 2 }
+
+pgsqlPgDependObjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific dependent object"
+	::= { pgsqlPgDependEntry 3 }
+
+pgsqlPgDependObjsubid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a table column, this is the column number (the objid and classid refer to the table itself). For all other object types, this column is zero"
+	::= { pgsqlPgDependEntry 4 }
+
+pgsqlPgDependRefclassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the referenced object is in"
+	::= { pgsqlPgDependEntry 5 }
+
+pgsqlPgDependRefobjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific referenced object"
+	::= { pgsqlPgDependEntry 6 }
+
+pgsqlPgDependRefobjsubid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a table column, this is the column number (the refobjid and refclassid refer to the table itself). For all other object types, this column is zero"
+	::= { pgsqlPgDependEntry 7 }
+
+pgsqlPgDependDeptype			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code defining the specific semantics of this dependency relationship; see text"
+	::= { pgsqlPgDependEntry 8 }
+
+
+---------------------------------------

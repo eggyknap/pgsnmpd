@@ -1,0 +1,69 @@
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgAuthMembersTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAuthMembersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_auth_members shows the membership relations between roles. Any non-circular set of relationships is allowed. Because user identities are cluster-wide, pg_auth_members is shared across all databases of a cluster: there is only one copy of pg_auth_members per cluster, not one per database."
+	::= { pgsqlCatalogTables 8 }
+
+pgsqlPgAuthMembersEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAuthMembersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_auth_members entry"
+	INDEX  { pgsnmpdConnID, pgsqlPgAuthMembersEntryOID }
+	::= { pgsqlPgAuthMembersTable 1 }
+
+PgsqlPgAuthMembersEntry ::=
+	SEQUENCE {
+		pgsqlPgAuthMembersEntryOID		INTEGER,
+		pgsqlPgAuthMembersRoleid		INTEGER,
+		pgsqlPgAuthMembersMember		INTEGER,
+		pgsqlPgAuthMembersGrantor		INTEGER,
+		pgsqlPgAuthMembersAdminOption		TruthValue
+	}
+
+pgsqlPgAuthMembersEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAuthMembersEntry 1 }
+
+pgsqlPgAuthMembersRoleid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of a role that has a member"
+	::= { pgsqlPgAuthMembersEntry 2 }
+
+pgsqlPgAuthMembersMember			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of a role that is a member of roleid"
+	::= { pgsqlPgAuthMembersEntry 3 }
+
+pgsqlPgAuthMembersGrantor			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of the role that granted this membership"
+	::= { pgsqlPgAuthMembersEntry 4 }
+
+pgsqlPgAuthMembersAdminOption			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if member may grant membership in roleid to others"
+	::= { pgsqlPgAuthMembersEntry 5 }
+
+
+---------------------------------------

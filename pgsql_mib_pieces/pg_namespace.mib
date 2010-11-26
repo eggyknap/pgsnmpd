@@ -1,0 +1,59 @@
+pgsqlPgNamespaceTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgNamespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_namespace stores namespaces. A namespace is the structure underlying SQL schemas: each namespace can have a separate collection of relations, types, etc. without name conflicts."
+	::= { pgsqlCatalogTables 22 }
+
+pgsqlPgNamespaceEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgNamespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single namespace"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgNamespaceEntryOID }
+	::= { pgsqlPgNamespaceTable 1 }
+
+PgsqlPgNamespaceEntry ::=
+	SEQUENCE {
+		pgsqlPgNamespaceEntryOID		INTEGER,
+		pgsqlPgNamespaceNspname		DisplayString,
+		pgsqlPgNamespaceNspowner		INTEGER,
+		pgsqlPgNamespaceNspacl		DisplayString
+	}
+
+pgsqlPgNamespaceEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgNamespaceEntry 1 }
+
+pgsqlPgNamespaceNspname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the namespace"
+	::= { pgsqlPgNamespaceEntry 2 }
+
+pgsqlPgNamespaceNspowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the namespace"
+	::= { pgsqlPgNamespaceEntry 3 }
+
+pgsqlPgNamespaceNspacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgNamespaceEntry 4 }
+
+
+---------------------------------------

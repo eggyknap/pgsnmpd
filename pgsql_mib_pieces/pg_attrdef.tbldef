@@ -1,0 +1,6 @@
+pg_attrdef	"The catalog pg_attrdef stores column default values. The main information about columns is stored in pg_attribute (see below). Only columns that explicitly specify a default value (when the table is created or the column is added) will have an entry here."	"pg_attrdef entry"	pgsqlCatalogTables	5	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+adrelid	INTEGER	"The table this column belongs to"
+adnum	INTEGER	"The number of the column"
+adbin	DisplayString	"The internal representation of the column default value"
+adsrc	DisplayString	"A human-readable representation of the default value"

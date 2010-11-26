@@ -1,0 +1,131 @@
+pgsqlPgIndexTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgIndexEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_index contains part of the information about indexes. The rest is mostly in pg_class."
+	::= { pgsqlCatalogTables 17 }
+
+pgsqlPgIndexEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgIndexEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single index"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgIndexEntryOID }
+	::= { pgsqlPgIndexTable 1 }
+
+PgsqlPgIndexEntry ::=
+	SEQUENCE {
+		pgsqlPgIndexEntryOID		INTEGER,
+		pgsqlPgIndexIndexrelid		INTEGER,
+		pgsqlPgIndexIndrelid		INTEGER,
+		pgsqlPgIndexIndnatts		INTEGER,
+		pgsqlPgIndexIndisunique		TruthValue,
+		pgsqlPgIndexIndisprimary		TruthValue,
+		pgsqlPgIndexIndisclustered		TruthValue,
+		pgsqlPgIndexIndisvalid		TruthValue,
+		pgsqlPgIndexIndkey		DisplayString,
+		pgsqlPgIndexIndclass		DisplayString,
+		pgsqlPgIndexIndexprs		DisplayString,
+		pgsqlPgIndexIndpred		DisplayString
+	}
+
+pgsqlPgIndexEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgIndexEntry 1 }
+
+pgsqlPgIndexIndexrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_class entry for this index"
+	::= { pgsqlPgIndexEntry 2 }
+
+pgsqlPgIndexIndrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_class entry for the table this index is for"
+	::= { pgsqlPgIndexEntry 3 }
+
+pgsqlPgIndexIndnatts			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of columns in the index (duplicates pg_class.relnatts )"
+	::= { pgsqlPgIndexEntry 4 }
+
+pgsqlPgIndexIndisunique			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, this is a unique index"
+	::= { pgsqlPgIndexEntry 5 }
+
+pgsqlPgIndexIndisprimary			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, this index represents the primary key of the table. ( indisunique should always be true when this is true.)"
+	::= { pgsqlPgIndexEntry 6 }
+
+pgsqlPgIndexIndisclustered			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, the table was last clustered on this index"
+	::= { pgsqlPgIndexEntry 7 }
+
+pgsqlPgIndexIndisvalid			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, the index is currently valid for queries. False means the index is possibly incomplete: it must still be modified by INSERT / UPDATE operations, but it cannot safely be used for queries. If it is unique, the uniqueness property is not true either"
+	::= { pgsqlPgIndexEntry 8 }
+
+pgsqlPgIndexIndkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is an array of indnatts values that indicate which table columns this index indexes. For example a value of 1 3 would mean that the first and the third table columns make up the index key. A zero in this array indicates that the corresponding index attribute is an expression over the table columns, rather than a simple column reference."
+	::= { pgsqlPgIndexEntry 9 }
+
+pgsqlPgIndexIndclass			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For each column in the index key this contains the OID of the operator class to use. See pg_opclass for details"
+	::= { pgsqlPgIndexEntry 10 }
+
+pgsqlPgIndexIndexprs			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression trees (in nodeToString() representation) for index attributes that are not simple column references. This is a list with one element for each zero entry in indkey . NULL if all index attributes are simple references"
+	::= { pgsqlPgIndexEntry 11 }
+
+pgsqlPgIndexIndpred			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression tree (in nodeToString() representation) for partial index predicate. NULL if not a partial index"
+	::= { pgsqlPgIndexEntry 12 }
+
+
+---------------------------------------

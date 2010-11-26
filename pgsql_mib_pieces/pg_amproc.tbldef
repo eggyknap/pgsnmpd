@@ -1,0 +1,5 @@
+pg_amproc	"The catalog pg_amproc stores information about support procedures associated with index access method operator classes. There is one row for each support procedure belonging to an operator class."	"pg_amproc entry"	pgsqlCatalogTables	4	"pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmprocAmopclaid"
+amopclaid	INTEGER	"The index operator class this entry is for"
+amprocsubtype	INTEGER	"Subtype, if cross-type routine, else zero"
+amprocnum	INTEGER	"Support procedure number"
+amproc	INTEGER	"OID of the procedure"

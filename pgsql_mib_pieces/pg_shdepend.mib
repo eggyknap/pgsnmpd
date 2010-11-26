@@ -1,0 +1,86 @@
+pgsqlPgShdependTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgShdependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_shdepend records the dependency relationships between database objects and shared objects, such as roles. This information allows PostgreSQL to ensure that those objects are unreferenced before attempting to delete them. See also pg_depend, which performs a similar function for dependencies involving objects within a single database. Unlike most system catalogs, pg_shdepend is shared across all databases of a cluster: there is only one copy of pg_shdepend per cluster, not one per database."
+	::= { pgsqlCatalogTables 28 }
+
+pgsqlPgShdependEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgShdependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single shared-object dependency"
+	INDEX  { pgsnmpdConnID, pgsqlPgShdependEntryOID }
+	::= { pgsqlPgShdependTable 1 }
+
+PgsqlPgShdependEntry ::=
+	SEQUENCE {
+		pgsqlPgShdependEntryOID		INTEGER,
+		pgsqlPgShdependDbid		INTEGER,
+		pgsqlPgShdependClassid		INTEGER,
+		pgsqlPgShdependObjid		INTEGER,
+		pgsqlPgShdependRefclassid		INTEGER,
+		pgsqlPgShdependRefobjid		INTEGER,
+		pgsqlPgShdependDeptype		DisplayString
+	}
+
+pgsqlPgShdependEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgShdependEntry 1 }
+
+pgsqlPgShdependDbid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the database the dependent object is in, or zero for a shared object"
+	::= { pgsqlPgShdependEntry 2 }
+
+pgsqlPgShdependClassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the dependent object is in"
+	::= { pgsqlPgShdependEntry 3 }
+
+pgsqlPgShdependObjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific dependent object"
+	::= { pgsqlPgShdependEntry 4 }
+
+pgsqlPgShdependRefclassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the referenced object is in (must be a shared catalog)"
+	::= { pgsqlPgShdependEntry 5 }
+
+pgsqlPgShdependRefobjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific referenced object"
+	::= { pgsqlPgShdependEntry 6 }
+
+pgsqlPgShdependDeptype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code defining the specific semantics of this dependency relationship; see text"
+	::= { pgsqlPgShdependEntry 7 }
+
+
+---------------------------------------

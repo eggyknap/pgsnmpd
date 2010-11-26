@@ -1,0 +1,77 @@
+pgsqlPgTsDictTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsDictEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_dict catalog contains entries defining text search dictionaries. A dictionary depends on a text search template, which specifies all the implementation functions needed; the dictionary itself provides values for the user-settable parameters supported by the template. This division of labor allows dictionaries to be created by unprivileged users. The parameters are specified by a text string dictinitoption, whose format and meaning vary depending on the template."
+	::= { pgsqlCatalogTables 38 }
+
+pgsqlPgTsDictEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsDictEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_dict entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsDictEntryOID }
+	::= { pgsqlPgTsDictTable 1 }
+
+PgsqlPgTsDictEntry ::=
+	SEQUENCE {
+		pgsqlPgTsDictEntryOID		INTEGER,
+		pgsqlPgTsDictDictname		DisplayString ,
+		pgsqlPgTsDictDictnamespace		INTEGER,
+		pgsqlPgTsDictDictowner		INTEGER,
+		pgsqlPgTsDictDicttemplate		INTEGER,
+		pgsqlPgTsDictDictinitoption		DisplayString
+	}
+
+pgsqlPgTsDictEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsDictEntry 1 }
+
+pgsqlPgTsDictDictname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search dictionary name"
+	::= { pgsqlPgTsDictEntry 2 }
+
+pgsqlPgTsDictDictnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this dictionary"
+	::= { pgsqlPgTsDictEntry 3 }
+
+pgsqlPgTsDictDictowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the dictionary"
+	::= { pgsqlPgTsDictEntry 4 }
+
+pgsqlPgTsDictDicttemplate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search template for this dictionary"
+	::= { pgsqlPgTsDictEntry 5 }
+
+pgsqlPgTsDictDictinitoption			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Initialization option string for the template"
+	::= { pgsqlPgTsDictEntry 6 }
+
+
+---------------------------------------

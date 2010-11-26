@@ -1,0 +1,239 @@
+pgsqlPgTypeTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTypeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_type stores information about data types. Base types (scalar types) are created with CREATE TYPE, and domains with CREATE DOMAIN. A composite type is automatically created for each table in the database, to represent the row structure of the table. It is also possible to create composite types with CREATE TYPE AS."
+	::= { pgsqlCatalogTables 33 }
+
+pgsqlPgTypeEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTypeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single type"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTypeEntryOID }
+	::= { pgsqlPgTypeTable 1 }
+
+PgsqlPgTypeEntry ::=
+	SEQUENCE {
+		pgsqlPgTypeEntryOID		INTEGER,
+		pgsqlPgTypeTypname		name,
+		pgsqlPgTypeTypnamespace		oid,
+		pgsqlPgTypeTypowner		oid,
+		pgsqlPgTypeTyplen		int2,
+		pgsqlPgTypeTypbyval		bool,
+		pgsqlPgTypeTyptype		char,
+		pgsqlPgTypeTypisdefined		bool,
+		pgsqlPgTypeTypdelim		char,
+		pgsqlPgTypeTyprelid		oid,
+		pgsqlPgTypeTypelem		oid,
+		pgsqlPgTypeTypinput		regproc,
+		pgsqlPgTypeTypoutput		regproc,
+		pgsqlPgTypeTypreceive		regproc,
+		pgsqlPgTypeTypsend		regproc,
+		pgsqlPgTypeTypanalyze		regproc,
+		pgsqlPgTypeTypalign		char,
+		pgsqlPgTypeTypstorage		char,
+		pgsqlPgTypeTypnotnull		bool,
+		pgsqlPgTypeTypbasetype		oid,
+		pgsqlPgTypeTyptypmod		int4,
+		pgsqlPgTypeTypndims		int4,
+		pgsqlPgTypeTypdefaultbin		text,
+		pgsqlPgTypeTypdefault		text
+	}
+
+pgsqlPgTypeEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTypeEntry 1 }
+
+pgsqlPgTypeTypname			OBJECT-TYPE
+	SYNTAX		name
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type name"
+	::= { pgsqlPgTypeEntry 2 }
+
+pgsqlPgTypeTypnamespace			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this type"
+	::= { pgsqlPgTypeEntry 3 }
+
+pgsqlPgTypeTypowner			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the type"
+	::= { pgsqlPgTypeEntry 4 }
+
+pgsqlPgTypeTyplen			OBJECT-TYPE
+	SYNTAX		int2
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a fixed-size type, typlen is the number of bytes in the internal representation of the type. But for a variable-length type, typlen is negative. -1 indicates a "
+	::= { pgsqlPgTypeEntry 5 }
+
+pgsqlPgTypeTypbyval			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typbyval determines whether internal routines pass a value of this type by value or by reference. typbyval had better be false if typlen is not 1, 2, or 4 (or 8 on machines where Datum is 8 bytes). Variable-length types are always passed by reference. Note that typbyval can be false even if the length would allow pass-by-value; this is currently true for type float4 , for example"
+	::= { pgsqlPgTypeEntry 6 }
+
+pgsqlPgTypeTyptype			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typtype is b for a base type, c for a composite type (e.g., a table's row type), d for a domain, or p for a pseudo-type. See also typrelid and typbasetype"
+	::= { pgsqlPgTypeEntry 7 }
+
+pgsqlPgTypeTypisdefined			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the type is defined, false if this is a placeholder entry for a not-yet-defined type. When typisdefined is false, nothing except the type name, namespace, and OID can be relied on"
+	::= { pgsqlPgTypeEntry 8 }
+
+pgsqlPgTypeTypdelim			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Character that separates two values of this type when parsing array input. Note that the delimiter is associated with the array element data type, not the array data type"
+	::= { pgsqlPgTypeEntry 9 }
+
+pgsqlPgTypeTyprelid			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is a composite type (see typtype ), then this column points to the pg_class entry that defines the corresponding table. (For a free-standing composite type, the pg_class entry doesn't really represent a table, but it is needed anyway for the type's pg_attribute entries to link to.) Zero for non-composite types"
+	::= { pgsqlPgTypeEntry 10 }
+
+pgsqlPgTypeTypelem			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If typelem is not 0 then it identifies another row in pg_type . The current type can then be subscripted like an array yielding values of type typelem . A "
+	::= { pgsqlPgTypeEntry 11 }
+
+pgsqlPgTypeTypinput			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Input conversion function (text format)"
+	::= { pgsqlPgTypeEntry 12 }
+
+pgsqlPgTypeTypoutput			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Output conversion function (text format)"
+	::= { pgsqlPgTypeEntry 13 }
+
+pgsqlPgTypeTypreceive			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Input conversion function (binary format), or 0 if none"
+	::= { pgsqlPgTypeEntry 14 }
+
+pgsqlPgTypeTypsend			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Output conversion function (binary format), or 0 if none"
+	::= { pgsqlPgTypeEntry 15 }
+
+pgsqlPgTypeTypanalyze			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom ANALYZE function, or 0 to use the standard function"
+	::= { pgsqlPgTypeEntry 16 }
+
+pgsqlPgTypeTypalign			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typalign is the alignment required when storing a value of this type. It applies to storage on disk as well as most representations of the value inside PostgreSQL . When multiple values are stored consecutively, such as in the representation of a complete row on disk, padding is inserted before a datum of this type so that it begins on the specified boundary. The alignment reference is the beginning of the first datum in the sequence. Possible values are: c = char alignment, i.e., no alignment needed. s = short alignment (2 bytes on most machines). i = int alignment (4 bytes on most machines). d = double alignment (8 bytes on many machines, but by no means all). Note: For types used in system tables, it is critical that the size and alignment defined in pg_type agree with the way that the compiler will lay out the column in a structure representing a table row."
+	::= { pgsqlPgTypeEntry 17 }
+
+pgsqlPgTypeTypstorage			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typstorage tells for varlena types (those with typlen = -1) if the type is prepared for toasting and what the default strategy for attributes of this type should be. Possible values are p : Value must always be stored plain. e : Value can be stored in a "
+	::= { pgsqlPgTypeEntry 18 }
+
+pgsqlPgTypeTypnotnull			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typnotnull represents a not-null constraint on a type. Used for domains only"
+	::= { pgsqlPgTypeEntry 19 }
+
+pgsqlPgTypeTypbasetype			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is a domain (see typtype ), then typbasetype identifies the type that this one is based on. Zero if this type is not a domain"
+	::= { pgsqlPgTypeEntry 20 }
+
+pgsqlPgTypeTyptypmod			OBJECT-TYPE
+	SYNTAX		int4
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Domains use typtypmod to record the typmod to be applied to their base type (-1 if base type does not use a typmod ). -1 if this type is not a domain"
+	::= { pgsqlPgTypeEntry 21 }
+
+pgsqlPgTypeTypndims			OBJECT-TYPE
+	SYNTAX		int4
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typndims is the number of array dimensions for a domain that is an array (that is, typbasetype is an array type; the domain's typelem will match the base type's typelem ). Zero for types other than array domains"
+	::= { pgsqlPgTypeEntry 22 }
+
+pgsqlPgTypeTypdefaultbin			OBJECT-TYPE
+	SYNTAX		text
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If typdefaultbin is not null, it is the nodeToString() representation of a default expression for the type. This is only used for domains"
+	::= { pgsqlPgTypeEntry 23 }
+
+pgsqlPgTypeTypdefault			OBJECT-TYPE
+	SYNTAX		text
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typdefault is null if the type has no associated default value. If typdefaultbin is not null, typdefault must contain a human-readable version of the default expression represented by typdefaultbin . If typdefaultbin is null and typdefault is not, then typdefault is the external representation of the type's default value, which may be fed to the type's input converter to produce a constant"
+	::= { pgsqlPgTypeEntry 24 }
+
+
+---------------------------------------

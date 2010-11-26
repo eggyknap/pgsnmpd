@@ -1,0 +1,95 @@
+pgsqlPgAmopTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmopEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_amop stores information about operators associated with index access method operator classes. There is one row for each operator that is a member of an operator class."
+	::= { pgsqlCatalogTables 3 }
+
+pgsqlPgAmopEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmopEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_amop entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmopEntryOID }
+	::= { pgsqlPgAmopTable 1 }
+
+PgsqlPgAmopEntry ::=
+	SEQUENCE {
+		pgsqlPgAmopEntryOID		INTEGER,
+		pgsqlPgAmopAmopfamily		INTEGER,
+		pgsqlPgAmopAmoplefttype		INTEGER,
+		pgsqlPgAmopAmoprighttype		INTEGER,
+		pgsqlPgAmopAmopstrategy		INTEGER,
+		pgsqlPgAmopAmopreqcheck		TruthValue,
+		pgsqlPgAmopAmopopr		INTEGER,
+		pgsqlPgAmopAmopmethod		INTEGER
+	}
+
+pgsqlPgAmopEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmopEntry 1 }
+
+pgsqlPgAmopAmopfamily			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The operator family this entry is for"
+	::= { pgsqlPgAmopEntry 2 }
+
+pgsqlPgAmopAmoplefttype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Left-hand input data type of operator"
+	::= { pgsqlPgAmopEntry 3 }
+
+pgsqlPgAmopAmoprighttype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Right-hand input data type of operator"
+	::= { pgsqlPgAmopEntry 4 }
+
+pgsqlPgAmopAmopstrategy			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Operator strategy number"
+	::= { pgsqlPgAmopEntry 5 }
+
+pgsqlPgAmopAmopreqcheck			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index hit must be rechecked"
+	::= { pgsqlPgAmopEntry 6 }
+
+pgsqlPgAmopAmopopr			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the operator"
+	::= { pgsqlPgAmopEntry 7 }
+
+pgsqlPgAmopAmopmethod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator family is for"
+	::= { pgsqlPgAmopEntry 8 }
+
+
+---------------------------------------

@@ -1,0 +1,9 @@
+pg_opclass	"The catalog pg_opclass defines index access method operator classes. Each operator class defines semantics for index columns of a particular data type and a particular index access method. Note that there can be multiple operator classes for a given data type/access method combination, thus supporting multiple behaviors."	"Represents an index access method operator class"	pgsqlCatalogTables	23	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+opcamid	INTEGER	"Index access method operator class is for"
+opcname	DisplayString	"Name of this operator class"
+opcnamespace	INTEGER	"Namespace of this operator class"
+opcowner	INTEGER	"Owner of the operator class"
+opcintype	INTEGER	"Data type that the operator class indexes"
+opcdefault	TruthValue	"True if this operator class is the default for opcintype"
+opckeytype	INTEGER	"Type of data stored in index, or zero if same as opcintype"

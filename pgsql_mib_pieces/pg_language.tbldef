@@ -1,0 +1,8 @@
+pg_language	"The catalog pg_language registers languages in which you can write functions or stored procedures."	"Represents a single language"	pgsqlCatalogTables	19	"entryID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+lanname	DisplayString	"Name of the language"	
+lanispl	TruthValue	"This is false for internal languages (such as SQL ) and true for user-defined languages. Currently, pg_dump still uses this to determine which languages need to be dumped, but this may be replaced by a different mechanism in the future"	
+lanpltrusted	TruthValue	"True if this is a trusted language, which means that it is believed not to grant access to anything outside the normal SQL execution environment. Only superusers may create functions in untrusted languages"	
+lanplcallfoid	INTEGER	"For noninternal languages this references the language handler, which is a special function that is responsible for executing all functions that are written in the particular language"	
+lanvalidator	INTEGER	"This references a language validator function that is responsible for checking the syntax and validity of new functions when they are created. Zero if no validator is provided"	
+lanacl	DisplayString	"Access privileges; see GRANT and REVOKE for details"	

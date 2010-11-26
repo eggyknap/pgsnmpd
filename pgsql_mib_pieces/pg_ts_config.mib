@@ -1,0 +1,68 @@
+pgsqlPgTsConfigTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_config catalog contains entries representing text search configurations. A configuration specifies a particular text search parser and a list of dictionaries to use for each of the parser's output token types. The parser is shown in the pg_ts_config entry, but the token-to-dictionary mapping is defined by subsidiary entries in pg_ts_config_map."
+	::= { pgsqlCatalogTables 36 }
+
+pgsqlPgTsConfigEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_config entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsConfigEntryOID }
+	::= { pgsqlPgTsConfigTable 1 }
+
+PgsqlPgTsConfigEntry ::=
+	SEQUENCE {
+		pgsqlPgTsConfigEntryOID		INTEGER,
+		pgsqlPgTsConfigCfgname		DisplayString ,
+		pgsqlPgTsConfigCfgnamespace		INTEGER,
+		pgsqlPgTsConfigCfgowner		INTEGER,
+		pgsqlPgTsConfigCfgparser		INTEGER
+	}
+
+pgsqlPgTsConfigEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsConfigEntry 1 }
+
+pgsqlPgTsConfigCfgname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search configuration name"
+	::= { pgsqlPgTsConfigEntry 2 }
+
+pgsqlPgTsConfigCfgnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this configuration"
+	::= { pgsqlPgTsConfigEntry 3 }
+
+pgsqlPgTsConfigCfgowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the configuration"
+	::= { pgsqlPgTsConfigEntry 4 }
+
+pgsqlPgTsConfigCfgparser			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search parser for this configuration"
+	::= { pgsqlPgTsConfigEntry 5 }
+
+
+---------------------------------------

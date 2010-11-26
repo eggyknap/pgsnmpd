@@ -1,0 +1,149 @@
+pgsqlPgTriggerTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTriggerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_trigger stores triggers on tables."
+	::= { pgsqlCatalogTables 32 }
+
+pgsqlPgTriggerEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTriggerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single trigger"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTriggerEntryOID }
+	::= { pgsqlPgTriggerTable 1 }
+
+PgsqlPgTriggerEntry ::=
+	SEQUENCE {
+		pgsqlPgTriggerEntryOID		INTEGER,
+		pgsqlPgTriggerTgrelid		INTEGER,
+		pgsqlPgTriggerTgname		DisplayString,
+		pgsqlPgTriggerTgfoid		INTEGER,
+		pgsqlPgTriggerTgtype		INTEGER,
+		pgsqlPgTriggerTgenabled		TruthValue,
+		pgsqlPgTriggerTgisconstraint		TruthValue,
+		pgsqlPgTriggerTgconstrname		DisplayString,
+		pgsqlPgTriggerTgconstrrelid		INTEGER,
+		pgsqlPgTriggerTgdeferrable		TruthValue,
+		pgsqlPgTriggerTginitdeferred		TruthValue,
+		pgsqlPgTriggerTgnargs		INTEGER,
+		pgsqlPgTriggerTgattr		DisplayString,
+		pgsqlPgTriggerTgargs		DisplayString
+	}
+
+pgsqlPgTriggerEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTriggerEntry 1 }
+
+pgsqlPgTriggerTgrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this trigger is on"
+	::= { pgsqlPgTriggerEntry 2 }
+
+pgsqlPgTriggerTgname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Trigger name (must be unique among triggers of same table)"
+	::= { pgsqlPgTriggerEntry 3 }
+
+pgsqlPgTriggerTgfoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The function to be called"
+	::= { pgsqlPgTriggerEntry 4 }
+
+pgsqlPgTriggerTgtype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Bit mask identifying trigger conditions"
+	::= { pgsqlPgTriggerEntry 5 }
+
+pgsqlPgTriggerTgenabled			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if trigger is enabled"
+	::= { pgsqlPgTriggerEntry 6 }
+
+pgsqlPgTriggerTgisconstraint			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if trigger implements a referential integrity constraint"
+	::= { pgsqlPgTriggerEntry 7 }
+
+pgsqlPgTriggerTgconstrname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Referential integrity constraint name"
+	::= { pgsqlPgTriggerEntry 8 }
+
+pgsqlPgTriggerTgconstrrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table referenced by an referential integrity constraint"
+	::= { pgsqlPgTriggerEntry 9 }
+
+pgsqlPgTriggerTgdeferrable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if deferrable"
+	::= { pgsqlPgTriggerEntry 10 }
+
+pgsqlPgTriggerTginitdeferred			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if initially deferred"
+	::= { pgsqlPgTriggerEntry 11 }
+
+pgsqlPgTriggerTgnargs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of argument strings passed to trigger function"
+	::= { pgsqlPgTriggerEntry 12 }
+
+pgsqlPgTriggerTgattr			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Currently unused"
+	::= { pgsqlPgTriggerEntry 13 }
+
+pgsqlPgTriggerTgargs			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Argument strings to pass to trigger, each NULL-terminated"
+	::= { pgsqlPgTriggerEntry 14 }
+
+
+---------------------------------------

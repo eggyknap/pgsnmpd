@@ -1,0 +1,95 @@
+pgsqlPgRewriteTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgRewriteEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_rewrite stores rewrite rules for tables and views."
+	::= { pgsqlCatalogTables 27 }
+
+pgsqlPgRewriteEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgRewriteEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single rewrite rule"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgRewriteEntryOID }
+	::= { pgsqlPgRewriteTable 1 }
+
+PgsqlPgRewriteEntry ::=
+	SEQUENCE {
+		pgsqlPgRewriteEntryOID		INTEGER,
+		pgsqlPgRewriteRulename		DisplayString,
+		pgsqlPgRewriteEvClass		INTEGER,
+		pgsqlPgRewriteEvAttr		INTEGER,
+		pgsqlPgRewriteEvType		DisplayString,
+		pgsqlPgRewriteIsInstead		TruthValue,
+		pgsqlPgRewriteEvQual		DisplayString,
+		pgsqlPgRewriteEvAction		DisplayString
+	}
+
+pgsqlPgRewriteEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgRewriteEntry 1 }
+
+pgsqlPgRewriteRulename			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Rule name"
+	::= { pgsqlPgRewriteEntry 2 }
+
+pgsqlPgRewriteEvClass			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this rule is for"
+	::= { pgsqlPgRewriteEntry 3 }
+
+pgsqlPgRewriteEvAttr			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The column this rule is for (currently, always zero to indicate the whole table)"
+	::= { pgsqlPgRewriteEntry 4 }
+
+pgsqlPgRewriteEvType			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Event type that the rule is for: 1 = SELECT , 2 = UPDATE , 3 = INSERT , 4 = DELETE"
+	::= { pgsqlPgRewriteEntry 5 }
+
+pgsqlPgRewriteIsInstead			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the rule is an INSTEAD rule"
+	::= { pgsqlPgRewriteEntry 6 }
+
+pgsqlPgRewriteEvQual			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression tree (in the form of a nodeToString() representation) for the rule's qualifying condition"
+	::= { pgsqlPgRewriteEntry 7 }
+
+pgsqlPgRewriteEvAction			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Query tree (in the form of a nodeToString() representation) for the rule's action"
+	::= { pgsqlPgRewriteEntry 8 }
+
+
+---------------------------------------

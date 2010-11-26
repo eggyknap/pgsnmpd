@@ -1,0 +1,14 @@
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pg_database	"The catalog pg_database stores information about the available databases. Databases are created with the CREATE DATABASE command. Unlike most system catalogs, pg_database is shared across all databases of a cluster: there is only one copy of pg_database per cluster, not one per database."	"A database"	pgsqlCatalogTables	14	"pgsnmpdConnID, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+datname	DisplayString	"Database name"
+datdba	INTEGER	"Owner of the database, usually the user who created it"
+encoding	INTEGER	"Character encoding for this database ( pg_encoding_to_char() can translate this number to the encoding name)"
+datistemplate	TruthValue	"If true then this database can be used in the TEMPLATE clause of CREATE DATABASE to create a new database as a clone of this one"
+datallowconn	TruthValue	"If false then no one can connect to this database. This is used to protect the template0 database from being altered"
+datconnlimit	INTEGER	"Sets maximum number of concurrent connections that can be made to this database. -1 means no limit"
+datlastsysoid	INTEGER	"Last system OID in the database; useful particularly to pg_dump"
+datfrozenxid	INTEGER	"All transaction IDs before this one have been replaced with a permanent ( ""frozen"" ) transaction ID in this database. This is used to track whether the database needs to be vacuumed in order to prevent transaction ID wraparound or to allow pg_clog to be shrunk. It is the minimum of the per-table pg_class . relfrozenxid values"
+dattablespace	INTEGER	"The default tablespace for the database. Within this database, all tables for which pg_class . reltablespace is zero will be stored in this tablespace; in particular, all the non-shared system catalogs will be there"
+datconfig	DisplayString	"Session defaults for run-time configuration variables"
+datacl	DisplayString	"Access privileges; see GRANT and REVOKE for details"

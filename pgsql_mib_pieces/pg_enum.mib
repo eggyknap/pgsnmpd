@@ -1,0 +1,50 @@
+pgsqlPgEnumTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgEnumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_enum catalog contains entries matching enum types to their associated values and labels. The internal representation of a given enum value is actually the OID of its associated row in pg_enum. The OIDs for a particular enum type are guaranteed to be ordered in the way the type should sort, but there is no guarantee about the ordering of OIDs of unrelated enum types."
+	::= { pgsqlCatalogTables 34 }
+
+pgsqlPgEnumEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgEnumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_enum entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgEnumEntryOID }
+	::= { pgsqlPgEnumTable 1 }
+
+PgsqlPgEnumEntry ::=
+	SEQUENCE {
+		pgsqlPgEnumEntryOID		INTEGER,
+		pgsqlPgEnumEnumtypid		INTEGER,
+		pgsqlPgEnumEnumlabel		DisplayString
+	}
+
+pgsqlPgEnumEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgEnumEntry 1 }
+
+pgsqlPgEnumEnumtypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_type entry owning this enum value"
+	::= { pgsqlPgEnumEntry 2 }
+
+pgsqlPgEnumEnumlabel			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The textual label for this enum value"
+	::= { pgsqlPgEnumEntry 3 }
+
+
+---------------------------------------

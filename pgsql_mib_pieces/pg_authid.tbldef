@@ -1,0 +1,14 @@
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pg_authid	"The catalog pg_authid contains information about database authorization identifiers (roles). A role subsumes the concepts of 'users' and 'groups'. A user is essentially just a role with the rolcanlogin flag set. Any role (with or without rolcanlogin) may have other roles as members; see pg_auth_members. Since this catalog contains passwords, it must not be publicly readable. pg_roles is a publicly readable view on pg_authid that blanks out the password field. Because user identities are cluster-wide, pg_authid is shared across all databases of a cluster: there is only one copy of pg_authid per cluster, not one per database."	"pg_authid entry"	pgsqlCatalogTables	7	"pgsnmpdConnID, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+rolname	INTEGER	"Role name"
+rolsuper	TruthValue	"Role has superuser privileges"
+rolinherit	TruthValue	"Role automatically inherits privileges of roles it is a member of"
+rolcreaterole	TruthValue	"Role may create more roles"
+rolcreatedb	TruthValue	"Role may create databases"
+rolcatupdate	TruthValue	"Role may update system catalogs directly. (Even a superuser may not do this unless this column is true)"
+rolcanlogin	TruthValue	"Role may log in. That is, this role can be given as the initial session authorization identifier"
+rolconnlimit	INTEGER	"For roles that can log in, this sets maximum number of concurrent connections this role can make. -1 means no limit"
+rolpassword	DisplayString	"Password (possibly encrypted); NULL if none"
+rolvaliduntil	DateAndTime	"Password expiry time (only used for password authentication); NULL if no expiration"
+rolconfig	DisplayString	"Session defaults for run-time configuration variables"

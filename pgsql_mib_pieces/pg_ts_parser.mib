@@ -1,0 +1,95 @@
+pgsqlPgTsParserTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsParserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_parser catalog contains entries defining text search parsers. A parser is responsible for splitting input text into lexemes and assigning a token type to each lexeme. Since a parser must be implemented by C-language-level functions, creation of new parsers is restricted to database superusers."
+	::= { pgsqlCatalogTables 39 }
+
+pgsqlPgTsParserEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsParserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_parser entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsParserEntryOID }
+	::= { pgsqlPgTsParserTable 1 }
+
+PgsqlPgTsParserEntry ::=
+	SEQUENCE {
+		pgsqlPgTsParserEntryOID		INTEGER,
+		pgsqlPgTsParserPrsname		DisplayString ,
+		pgsqlPgTsParserPrsnamespace		INTEGER,
+		pgsqlPgTsParserPrsstart		INTEGER,
+		pgsqlPgTsParserPrstoken		INTEGER,
+		pgsqlPgTsParserPrsend		INTEGER,
+		pgsqlPgTsParserPrsheadline		INTEGER,
+		pgsqlPgTsParserPrslextype		INTEGER
+	}
+
+pgsqlPgTsParserEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsParserEntry 1 }
+
+pgsqlPgTsParserPrsname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search parser name"
+	::= { pgsqlPgTsParserEntry 2 }
+
+pgsqlPgTsParserPrsnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this parser"
+	::= { pgsqlPgTsParserEntry 3 }
+
+pgsqlPgTsParserPrsstart			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's startup function"
+	::= { pgsqlPgTsParserEntry 4 }
+
+pgsqlPgTsParserPrstoken			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's next-token function"
+	::= { pgsqlPgTsParserEntry 5 }
+
+pgsqlPgTsParserPrsend			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's shutdown function"
+	::= { pgsqlPgTsParserEntry 6 }
+
+pgsqlPgTsParserPrsheadline			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's headline function"
+	::= { pgsqlPgTsParserEntry 7 }
+
+pgsqlPgTsParserPrslextype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's lextype function"
+	::= { pgsqlPgTsParserEntry 8 }
+
+
+---------------------------------------

@@ -1,0 +1,185 @@
+pgsqlPgOperatorTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOperatorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_operator stores information about operators."
+	::= { pgsqlCatalogTables 24 }
+
+pgsqlPgOperatorEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOperatorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single operator"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOperatorEntryOID }
+	::= { pgsqlPgOperatorTable 1 }
+
+PgsqlPgOperatorEntry ::=
+	SEQUENCE {
+		pgsqlPgOperatorEntryOID		INTEGER,
+		pgsqlPgOperatorOprname		DisplayString,
+		pgsqlPgOperatorOprnamespace		INTEGER,
+		pgsqlPgOperatorOprowner		INTEGER,
+		pgsqlPgOperatorOprkind		DisplayString,
+		pgsqlPgOperatorOprcanhash		TruthValue,
+		pgsqlPgOperatorOprleft		INTEGER,
+		pgsqlPgOperatorOprright		INTEGER,
+		pgsqlPgOperatorOprresult		INTEGER,
+		pgsqlPgOperatorOprcom		INTEGER,
+		pgsqlPgOperatorOprnegate		INTEGER,
+		pgsqlPgOperatorOprlsortop		INTEGER,
+		pgsqlPgOperatorOprrsortop		INTEGER,
+		pgsqlPgOperatorOprltcmpop		INTEGER,
+		pgsqlPgOperatorOprgtcmpop		INTEGER,
+		pgsqlPgOperatorOprcode		INTEGER,
+		pgsqlPgOperatorOprrest		INTEGER,
+		pgsqlPgOperatorOprjoin		INTEGER
+	}
+
+pgsqlPgOperatorEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOperatorEntry 1 }
+
+pgsqlPgOperatorOprname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the operator"
+	::= { pgsqlPgOperatorEntry 2 }
+
+pgsqlPgOperatorOprnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this operator"
+	::= { pgsqlPgOperatorEntry 3 }
+
+pgsqlPgOperatorOprowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator"
+	::= { pgsqlPgOperatorEntry 4 }
+
+pgsqlPgOperatorOprkind			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"b = infix ( "
+	::= { pgsqlPgOperatorEntry 5 }
+
+pgsqlPgOperatorOprcanhash			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This operator supports hash joins"
+	::= { pgsqlPgOperatorEntry 6 }
+
+pgsqlPgOperatorOprleft			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the left operand"
+	::= { pgsqlPgOperatorEntry 7 }
+
+pgsqlPgOperatorOprright			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the right operand"
+	::= { pgsqlPgOperatorEntry 8 }
+
+pgsqlPgOperatorOprresult			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the result"
+	::= { pgsqlPgOperatorEntry 9 }
+
+pgsqlPgOperatorOprcom			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Commutator of this operator, if any"
+	::= { pgsqlPgOperatorEntry 10 }
+
+pgsqlPgOperatorOprnegate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Negator of this operator, if any"
+	::= { pgsqlPgOperatorEntry 11 }
+
+pgsqlPgOperatorOprlsortop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the operator that sorts the type of the left-hand operand ( L<L )"
+	::= { pgsqlPgOperatorEntry 12 }
+
+pgsqlPgOperatorOprrsortop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the operator that sorts the type of the right-hand operand ( R<R )"
+	::= { pgsqlPgOperatorEntry 13 }
+
+pgsqlPgOperatorOprltcmpop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the less-than operator that compares the left and right operand types ( L<R )"
+	::= { pgsqlPgOperatorEntry 14 }
+
+pgsqlPgOperatorOprgtcmpop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the greater-than operator that compares the left and right operand types ( L>R )"
+	::= { pgsqlPgOperatorEntry 15 }
+
+pgsqlPgOperatorOprcode			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function that implements this operator"
+	::= { pgsqlPgOperatorEntry 16 }
+
+pgsqlPgOperatorOprrest			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restriction selectivity estimation function for this operator"
+	::= { pgsqlPgOperatorEntry 17 }
+
+pgsqlPgOperatorOprjoin			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Join selectivity estimation function for this operator"
+	::= { pgsqlPgOperatorEntry 18 }
+
+
+---------------------------------------

@@ -1,0 +1,68 @@
+pgsqlPgCastTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgCastEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_cast stores data type conversion paths, both built-in paths and those defined with CREATE CAST."
+	::= { pgsqlCatalogTables 10 }
+
+pgsqlPgCastEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgCastEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_cast entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgCastEntryOID }
+	::= { pgsqlPgCastTable 1 }
+
+PgsqlPgCastEntry ::=
+	SEQUENCE {
+		pgsqlPgCastEntryOID		INTEGER,
+		pgsqlPgCastCastsource		INTEGER,
+		pgsqlPgCastCasttarget		INTEGER,
+		pgsqlPgCastCastfunc		INTEGER,
+		pgsqlPgCastCastcontext		DisplayString
+	}
+
+pgsqlPgCastEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgCastEntry 1 }
+
+pgsqlPgCastCastsource			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the source data type"
+	::= { pgsqlPgCastEntry 2 }
+
+pgsqlPgCastCasttarget			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the target data type"
+	::= { pgsqlPgCastEntry 3 }
+
+pgsqlPgCastCastfunc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the function to use to perform this cast. Zero is stored if the data types are binary compatible (that is, no run-time operation is needed to perform the cast)"
+	::= { pgsqlPgCastEntry 4 }
+
+pgsqlPgCastCastcontext			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates what contexts the cast may be invoked in. e means only as an explicit cast (using CAST or :: syntax). a means implicitly in assignment to a target column, as well as explicitly. i means implicitly in expressions, as well as the other cases"
+	::= { pgsqlPgCastEntry 5 }
+
+
+---------------------------------------

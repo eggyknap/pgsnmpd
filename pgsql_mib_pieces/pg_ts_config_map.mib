@@ -1,0 +1,68 @@
+pgsqlPgTsConfigMapTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsConfigMapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_config_map catalog contains entries showing which text search dictionaries should be consulted, and in what order, for each output token type of each text search configuration's parser."
+	::= { pgsqlCatalogTables 37 }
+
+pgsqlPgTsConfigMapEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsConfigMapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_config_map entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsConfigMapEntryOID }
+	::= { pgsqlPgTsConfigMapTable 1 }
+
+PgsqlPgTsConfigMapEntry ::=
+	SEQUENCE {
+		pgsqlPgTsConfigMapEntryOID		INTEGER,
+		pgsqlPgTsConfigMapMapcfg		INTEGER,
+		pgsqlPgTsConfigMapMaptokentype		INTEGER,
+		pgsqlPgTsConfigMapMapseqno		INTEGER,
+		pgsqlPgTsConfigMapMapdict		INTEGER
+	}
+
+pgsqlPgTsConfigMapEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsConfigMapEntry 1 }
+
+pgsqlPgTsConfigMapMapcfg			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_ts_config entry owning this map entry"
+	::= { pgsqlPgTsConfigMapEntry 2 }
+
+pgsqlPgTsConfigMapMaptokentype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A token type emitted by the configuration's parser"
+	::= { pgsqlPgTsConfigMapEntry 3 }
+
+pgsqlPgTsConfigMapMapseqno			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Order in which to consult this entry (lower mapseqnos first)"
+	::= { pgsqlPgTsConfigMapEntry 4 }
+
+pgsqlPgTsConfigMapMapdict			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search dictionary to consult"
+	::= { pgsqlPgTsConfigMapEntry 5 }
+
+
+---------------------------------------

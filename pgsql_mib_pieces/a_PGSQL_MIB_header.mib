@@ -1,0 +1,100 @@
+  PGSQL-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Counter32, Gauge32, Integer32, enterprises
+          FROM SNMPv2-SMI
+      Float
+          FROM UCD-SNMP-MIB
+      DisplayString, DateAndTime, TruthValue
+          FROM SNMPv2-TC
+      rdbmsDbIndex
+          FROM RDBMS-MIB;
+
+  pgsql MODULE-IDENTITY
+      LAST-UPDATED "200708152113Z"
+      ORGANIZATION "pgsnmpd Development Team"
+      CONTACT-INFO
+              "E-mail: pgsnmpd-devel@pgfoundry.org
+	       WWW: http://pgsnmpd.projects.postgresql.org"
+      DESCRIPTION
+          "MIB to describe a PostgreSQL database"
+
+      ::= { enterprises 27645 }
+
+  pgsqlObjects        OBJECT IDENTIFIER ::= { pgsql 1 }
+
+  pgsnmpdTables		OBJECT IDENTIFIER ::= { pgsqlObjects 1 }
+
+  pgsqlCatalogTables	OBJECT IDENTIFIER ::= { pgsqlObjects 2 }
+
+  ----------------------------------------------------------------
+
+pgsnmpdConnectionsTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsnmpdConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The table of connections this SNMP agent has to PostgreSQL databases"
+	::= { pgsnmpdTables 1 }
+
+pgsnmpdConnectionEntry 		OBJECT-TYPE
+	SYNTAX		PgsnmpdConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A single connection from pgsnmpd to a PostgreSQL database in a
+		database cluster"
+	INDEX	{ pgsnmpdConnID }
+	::= { pgsnmpdConnectionsTable 1 }
+
+PgsnmpdConnectionEntry ::=
+	SEQUENCE {
+		pgsnmpdConnID		INTEGER,
+        pgsnmpdConnDesc     DisplayString,
+		pgsnmpdConnHost		DisplayString,
+		pgsnmpdConnPort		DisplayString,
+		pgsnmpdConnDbName	DisplayString
+	}
+
+pgsnmpdConnID		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Identifying integer for this connection."
+	::= { pgsnmpdConnectionEntry 1 }
+
+pgsnmpdConnDesc     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "User-generated decriptive string for this connection."
+    ::= { pgsnmpdConnectionEntry 2 }
+
+pgsnmpdConnHost		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Host name, IP address, or other identifier of the host PostgreSQL server for this connection"
+	::= { pgsnmpdConnectionEntry 3 }
+
+pgsnmpdConnPort		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"PostgreSQL server port number for this connection"
+	::= { pgsnmpdConnectionEntry 4 }
+
+pgsnmpdConnDbName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Name of the database this connection is connected to"
+	::= { pgsnmpdConnectionEntry 5 }
+
+  ----------------------------------------------------------------

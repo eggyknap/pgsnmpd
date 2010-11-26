@@ -1,0 +1,9 @@
+pg_rewrite	"The catalog pg_rewrite stores rewrite rules for tables and views."	"Represents a single rewrite rule"	pgsqlCatalogTables	27	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+rulename	DisplayString	"Rule name"		
+ev_class	INTEGER	"The table this rule is for"		
+ev_attr	INTEGER	"The column this rule is for (currently, always zero to indicate the whole table)"		
+ev_type	DisplayString	"Event type that the rule is for: 1 = SELECT , 2 = UPDATE , 3 = INSERT , 4 = DELETE"		
+is_instead	TruthValue	"True if the rule is an INSTEAD rule"		
+ev_qual	DisplayString	"Expression tree (in the form of a nodeToString() representation) for the rule's qualifying condition"		
+ev_action	DisplayString	"Query tree (in the form of a nodeToString() representation) for the rule's action"		

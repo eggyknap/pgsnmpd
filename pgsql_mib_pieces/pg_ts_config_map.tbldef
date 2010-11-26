@@ -1,0 +1,5 @@
+pg_ts_config_map	"The pg_ts_config_map catalog contains entries showing which text search dictionaries should be consulted, and in what order, for each output token type of each text search configuration's parser."	"pg_ts_config_map entry"	pgsqlCatalogTables	37	"pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsConfigMapMapcfg, pgsqlPgTsConfigMapMapseqno"
+mapcfg	INTEGER	The OID of the pg_ts_config entry owning this map entry
+mapseqno	INTEGER	Order in which to consult this entry (lower mapseqnos first)
+maptokentype	INTEGER	A token type emitted by the configuration's parser
+mapdict	INTEGER	The OID of the text search dictionary to consult

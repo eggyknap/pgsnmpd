@@ -1,0 +1,167 @@
+pgsqlPgConstraintTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgConstraintEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_constraint stores check, primary key, unique, and foreign key constraints on tables. (Column constraints are not treated specially. Every column constraint is equivalent to some table constraint.) Not-null constraints are represented in the pg_attribute catalog."
+	::= { pgsqlCatalogTables 12 }
+
+pgsqlPgConstraintEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgConstraintEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A constraint entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgConstraintEntryOID }
+	::= { pgsqlPgConstraintTable 1 }
+
+PgsqlPgConstraintEntry ::=
+	SEQUENCE {
+		pgsqlPgConstraintEntryOID		INTEGER,
+		pgsqlPgConstraintConname		DisplayString,
+		pgsqlPgConstraintConnamespace		INTEGER,
+		pgsqlPgConstraintContype		DisplayString,
+		pgsqlPgConstraintCondeferrable		TruthValue,
+		pgsqlPgConstraintCondeferred		TruthValue,
+		pgsqlPgConstraintConrelid		INTEGER,
+		pgsqlPgConstraintContypid		INTEGER,
+		pgsqlPgConstraintConfrelid		INTEGER,
+		pgsqlPgConstraintConfupdtype		DisplayString,
+		pgsqlPgConstraintConfdeltype		DisplayString,
+		pgsqlPgConstraintConfmatchtype		DisplayString,
+		pgsqlPgConstraintConkey		DisplayString,
+		pgsqlPgConstraintConfkey		DisplayString,
+		pgsqlPgConstraintConbin		DisplayString,
+		pgsqlPgConstraintConsrc		DisplayString
+	}
+
+pgsqlPgConstraintEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgConstraintEntry 1 }
+
+pgsqlPgConstraintConname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Constraint name (not necessarily unique!)"
+	::= { pgsqlPgConstraintEntry 2 }
+
+pgsqlPgConstraintConnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this constraint"
+	::= { pgsqlPgConstraintEntry 3 }
+
+pgsqlPgConstraintContype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"c = check constraint, f = foreign key constraint, p = primary key constraint, u = unique constraint"
+	::= { pgsqlPgConstraintEntry 4 }
+
+pgsqlPgConstraintCondeferrable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Is the constraint deferrable?"
+	::= { pgsqlPgConstraintEntry 5 }
+
+pgsqlPgConstraintCondeferred			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Is the constraint deferred by default?"
+	::= { pgsqlPgConstraintEntry 6 }
+
+pgsqlPgConstraintConrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this constraint is on; 0 if not a table constraint"
+	::= { pgsqlPgConstraintEntry 7 }
+
+pgsqlPgConstraintContypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The domain this constraint is on; 0 if not a domain constraint"
+	::= { pgsqlPgConstraintEntry 8 }
+
+pgsqlPgConstraintConfrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a foreign key, the referenced table; else 0"
+	::= { pgsqlPgConstraintEntry 9 }
+
+pgsqlPgConstraintConfupdtype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key update action code"
+	::= { pgsqlPgConstraintEntry 10 }
+
+pgsqlPgConstraintConfdeltype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key deletion action code"
+	::= { pgsqlPgConstraintEntry 11 }
+
+pgsqlPgConstraintConfmatchtype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key match type"
+	::= { pgsqlPgConstraintEntry 12 }
+
+pgsqlPgConstraintConkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a table constraint, list of columns which the constraint constrains"
+	::= { pgsqlPgConstraintEntry 13 }
+
+pgsqlPgConstraintConfkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a foreign key, list of the referenced columns"
+	::= { pgsqlPgConstraintEntry 14 }
+
+pgsqlPgConstraintConbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a check constraint, an internal representation of the expression"
+	::= { pgsqlPgConstraintEntry 15 }
+
+pgsqlPgConstraintConsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a check constraint, a human-readable representation of the expression"
+	::= { pgsqlPgConstraintEntry 16 }
+
+
+---------------------------------------

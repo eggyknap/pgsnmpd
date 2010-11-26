@@ -1,0 +1,59 @@
+pgsqlPgInheritsTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgInheritsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_inherits records information about table inheritance hierarchies. There is one entry for each direct child table in the database. (Indirect inheritance can be determined by following chains of entries.)"
+	::= { pgsqlCatalogTables 18 }
+
+pgsqlPgInheritsEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgInheritsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents an inheritance relationship"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgInheritsEntryOID }
+	::= { pgsqlPgInheritsTable 1 }
+
+PgsqlPgInheritsEntry ::=
+	SEQUENCE {
+		pgsqlPgInheritsEntryOID		INTEGER,
+		pgsqlPgInheritsInhrelid		INTEGER,
+		pgsqlPgInheritsInhparent		INTEGER,
+		pgsqlPgInheritsInhseqno		INTEGER
+	}
+
+pgsqlPgInheritsEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgInheritsEntry 1 }
+
+pgsqlPgInheritsInhrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the child table"
+	::= { pgsqlPgInheritsEntry 2 }
+
+pgsqlPgInheritsInhparent			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the parent table"
+	::= { pgsqlPgInheritsEntry 3 }
+
+pgsqlPgInheritsInhseqno			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in which the inherited columns are to be arranged. The count starts at 1"
+	::= { pgsqlPgInheritsEntry 4 }
+
+
+---------------------------------------

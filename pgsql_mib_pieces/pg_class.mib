@@ -1,0 +1,275 @@
+pgsqlPgClassTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgClassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_class catalogs tables and most everything else that has columns or is otherwise similar to a table. This includes indexes (but see also pg_index), sequences, views, composite types, and TOAST tables; see relkind. Below, when we mean all of these kinds of objects we speak of 'relations'. Not all columns are meaningful for all relation types."
+	::= { pgsqlCatalogTables 11 }
+
+pgsqlPgClassEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgClassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_class entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgClassEntryOID }
+	::= { pgsqlPgClassTable 1 }
+
+PgsqlPgClassEntry ::=
+	SEQUENCE {
+		pgsqlPgClassEntryOID		INTEGER,
+		pgsqlPgClassRelname		DisplayString,
+		pgsqlPgClassRelnamespace		INTEGER,
+		pgsqlPgClassReltype		INTEGER,
+		pgsqlPgClassRelowner		INTEGER,
+		pgsqlPgClassRelam		INTEGER,
+		pgsqlPgClassRelfilenode		INTEGER,
+		pgsqlPgClassReltablespace		INTEGER,
+		pgsqlPgClassRelpages		INTEGER,
+		pgsqlPgClassReltuples		Float,
+		pgsqlPgClassReltoastrelid		INTEGER,
+		pgsqlPgClassReltoastidxid		INTEGER,
+		pgsqlPgClassRelhasindex		TruthValue,
+		pgsqlPgClassRelisshared		TruthValue,
+		pgsqlPgClassRelkind		DisplayString,
+		pgsqlPgClassRelnatts		INTEGER,
+		pgsqlPgClassRelchecks		INTEGER,
+		pgsqlPgClassReltriggers		INTEGER,
+		pgsqlPgClassRelukeys		INTEGER,
+		pgsqlPgClassRelfkeys		INTEGER,
+		pgsqlPgClassRelrefs		INTEGER,
+		pgsqlPgClassRelhasoids		TruthValue,
+		pgsqlPgClassRelhaspkey		TruthValue,
+		pgsqlPgClassRelhasrules		TruthValue,
+		pgsqlPgClassRelhassubclass		TruthValue,
+		pgsqlPgClassRelfrozenxid		INTEGER,
+		pgsqlPgClassRelacl		DisplayString,
+		pgsqlPgClassReloptions		DisplayString
+	}
+
+pgsqlPgClassEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgClassEntry 1 }
+
+pgsqlPgClassRelname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the table, index, view, etc."
+	::= { pgsqlPgClassEntry 2 }
+
+pgsqlPgClassRelnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this relation"
+	::= { pgsqlPgClassEntry 3 }
+
+pgsqlPgClassReltype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the data type that corresponds to this table's row type, if any (zero for indexes, which have no pg_type entry)"
+	::= { pgsqlPgClassEntry 4 }
+
+pgsqlPgClassRelowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the relation"
+	::= { pgsqlPgClassEntry 5 }
+
+pgsqlPgClassRelam			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is an index, the access method used (B-tree, hash, etc.)"
+	::= { pgsqlPgClassEntry 6 }
+
+pgsqlPgClassRelfilenode			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the on-disk file of this relation; 0 if none"
+	::= { pgsqlPgClassEntry 7 }
+
+pgsqlPgClassReltablespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The tablespace in which this relation is stored. If zero, the database's default tablespace is implied. (Not meaningful if the relation has no on-disk file.)"
+	::= { pgsqlPgClassEntry 8 }
+
+pgsqlPgClassRelpages			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Size of the on-disk representation of this table in pages (of size BLCKSZ ). This is only an estimate used by the planner. It is updated by VACUUM , ANALYZE , and a few DDL commands such as CREATE INDEX"
+	::= { pgsqlPgClassEntry 9 }
+
+pgsqlPgClassReltuples			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of rows in the table. This is only an estimate used by the planner. It is updated by VACUUM , ANALYZE , and a few DDL commands such as CREATE INDEX"
+	::= { pgsqlPgClassEntry 10 }
+
+pgsqlPgClassReltoastrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the TOAST table associated with this table, 0 if none. The TOAST table stores large attributes "
+	::= { pgsqlPgClassEntry 11 }
+
+pgsqlPgClassReltoastidxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a TOAST table, the OID of its index. 0 if not a TOAST table"
+	::= { pgsqlPgClassEntry 12 }
+
+pgsqlPgClassRelhasindex			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is a table and it has (or recently had) any indexes. This is set by CREATE INDEX , but not cleared immediately by DROP INDEX . VACUUM clears relhasindex if it finds the table has no indexes"
+	::= { pgsqlPgClassEntry 13 }
+
+pgsqlPgClassRelisshared			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this table is shared across all databases in the cluster. Only certain system catalogs (such as pg_database ) are shared"
+	::= { pgsqlPgClassEntry 14 }
+
+pgsqlPgClassRelkind			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"r = ordinary table, i = index, S = sequence, v = view, c = composite type, t = TOAST table"
+	::= { pgsqlPgClassEntry 15 }
+
+pgsqlPgClassRelnatts			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of user columns in the relation (system columns not counted). There must be this many corresponding entries in pg_attribute . See also pg_attribute.attnum"
+	::= { pgsqlPgClassEntry 16 }
+
+pgsqlPgClassRelchecks			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of check constraints on the table; see pg_constraint catalog"
+	::= { pgsqlPgClassEntry 17 }
+
+pgsqlPgClassReltriggers			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of triggers on the table; see pg_trigger catalog"
+	::= { pgsqlPgClassEntry 18 }
+
+pgsqlPgClassRelukeys			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused ( not the number of unique keys)"
+	::= { pgsqlPgClassEntry 19 }
+
+pgsqlPgClassRelfkeys			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused ( not the number of foreign keys on the table)"
+	::= { pgsqlPgClassEntry 20 }
+
+pgsqlPgClassRelrefs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused"
+	::= { pgsqlPgClassEntry 21 }
+
+pgsqlPgClassRelhasoids			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if we generate an OID for each row of the relation"
+	::= { pgsqlPgClassEntry 22 }
+
+pgsqlPgClassRelhaspkey			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the table has (or once had) a primary key"
+	::= { pgsqlPgClassEntry 23 }
+
+pgsqlPgClassRelhasrules			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if table has rules; see pg_rewrite catalog"
+	::= { pgsqlPgClassEntry 24 }
+
+pgsqlPgClassRelhassubclass			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if table has (or once had) any inheritance children"
+	::= { pgsqlPgClassEntry 25 }
+
+pgsqlPgClassRelfrozenxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"All transaction IDs before this one have been replaced with a permanent ( "
+	::= { pgsqlPgClassEntry 26 }
+
+pgsqlPgClassRelacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgClassEntry 27 }
+
+pgsqlPgClassReloptions			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access-method-specific options, as "
+	::= { pgsqlPgClassEntry 28 }
+
+
+---------------------------------------

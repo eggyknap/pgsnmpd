@@ -1,0 +1,6 @@
+pg_opfamily	"The catalog pg_opfamily defines operator families. Each operator family is a collection of operators and associated support routines that implement the semantics specified for a particular index access method. Furthermore, the operators in a family are all 'compatible', in a way that is specified by the access method. The operator family concept allows cross-data-type operators to be used with indexes and to be reasoned about using knowledge of access method semantics."	"pg_opfamily entry"	pgsqlCatalogTables	35	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+opfmethod	INTEGER	Index access method operator family is for
+opfname	DisplayString	Name of this operator family
+opfnamespace	INTEGER	Namespace of this operator family
+opfowner	INTEGER	Owner of the operator family

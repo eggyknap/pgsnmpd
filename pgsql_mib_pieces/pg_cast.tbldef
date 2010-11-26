@@ -1,0 +1,6 @@
+pg_cast	"The catalog pg_cast stores data type conversion paths, both built-in paths and those defined with CREATE CAST."	"pg_cast entry"	pgsqlCatalogTables	10	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+castsource	INTEGER	"OID of the source data type"
+casttarget	INTEGER	"OID of the target data type"
+castfunc	INTEGER	"The OID of the function to use to perform this cast. Zero is stored if the data types are binary compatible (that is, no run-time operation is needed to perform the cast)"
+castcontext	DisplayString	"Indicates what contexts the cast may be invoked in. e means only as an explicit cast (using CAST or :: syntax). a means implicitly in assignment to a target column, as well as explicitly. i means implicitly in expressions, as well as the other cases"

@@ -1,0 +1,194 @@
+pgsqlPgProcTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_proc stores information about functions (or procedures). The table contains data for aggregate functions as well as plain functions. If proisagg is true, there should be a matching row in pg_aggregate."
+	::= { pgsqlCatalogTables 26 }
+
+pgsqlPgProcEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single stored procedure"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgProcEntryOID }
+	::= { pgsqlPgProcTable 1 }
+
+PgsqlPgProcEntry ::=
+	SEQUENCE {
+		pgsqlPgProcEntryOID		INTEGER,
+		pgsqlPgProcProname		DisplayString,
+		pgsqlPgProcPronamespace		INTEGER,
+		pgsqlPgProcProowner		INTEGER,
+		pgsqlPgProcProlang		INTEGER,
+		pgsqlPgProcProisagg		TruthValue,
+		pgsqlPgProcProsecdef		TruthValue,
+		pgsqlPgProcProisstrict		TruthValue,
+		pgsqlPgProcProretset		TruthValue,
+		pgsqlPgProcProvolatile		DisplayString,
+		pgsqlPgProcPronargs		INTEGER,
+		pgsqlPgProcProrettype		INTEGER,
+		pgsqlPgProcProargtypes		DisplayString,
+		pgsqlPgProcProallargtypes		DisplayString,
+		pgsqlPgProcProargmodes		DisplayString,
+		pgsqlPgProcProargnames		DisplayString,
+		pgsqlPgProcProsrc		DisplayString,
+		pgsqlPgProcProbin		DisplayString,
+		pgsqlPgProcProacl		DisplayString
+	}
+
+pgsqlPgProcEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgProcEntry 1 }
+
+pgsqlPgProcProname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the function"
+	::= { pgsqlPgProcEntry 2 }
+
+pgsqlPgProcPronamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this function"
+	::= { pgsqlPgProcEntry 3 }
+
+pgsqlPgProcProowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the function"
+	::= { pgsqlPgProcEntry 4 }
+
+pgsqlPgProcProlang			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Implementation language or call interface of this function"
+	::= { pgsqlPgProcEntry 5 }
+
+pgsqlPgProcProisagg			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function is an aggregate function"
+	::= { pgsqlPgProcEntry 6 }
+
+pgsqlPgProcProsecdef			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function is a security definer (i.e., a "
+	::= { pgsqlPgProcEntry 7 }
+
+pgsqlPgProcProisstrict			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function returns null if any call argument is null. In that case the function won't actually be called at all. Functions that are not "
+	::= { pgsqlPgProcEntry 8 }
+
+pgsqlPgProcProretset			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function returns a set (i.e., multiple values of the specified data type)"
+	::= { pgsqlPgProcEntry 9 }
+
+pgsqlPgProcProvolatile			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"provolatile tells whether the function's result depends only on its input arguments, or is affected by outside factors. It is i for "
+	::= { pgsqlPgProcEntry 10 }
+
+pgsqlPgProcPronargs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of arguments"
+	::= { pgsqlPgProcEntry 11 }
+
+pgsqlPgProcProrettype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type of the return value"
+	::= { pgsqlPgProcEntry 12 }
+
+pgsqlPgProcProargtypes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the data types of the function arguments. This includes only input arguments (including INOUT arguments), and thus represents the call signature of the function"
+	::= { pgsqlPgProcEntry 13 }
+
+pgsqlPgProcProallargtypes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the data types of the function arguments. This includes all arguments (including OUT and INOUT arguments); however, if all the arguments are IN arguments, this field will be null. Note that subscripting is 1-based, whereas for historical reasons proargtypes is subscripted from 0"
+	::= { pgsqlPgProcEntry 14 }
+
+pgsqlPgProcProargmodes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the modes of the function arguments, encoded as i for IN arguments, o for OUT arguments, b for INOUT arguments. If all the arguments are IN arguments, this field will be null. Note that subscripts correspond to positions of proallargtypes not proargtypes"
+	::= { pgsqlPgProcEntry 15 }
+
+pgsqlPgProcProargnames			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the names of the function arguments. Arguments without a name are set to empty strings in the array. If none of the arguments have a name, this field will be null. Note that subscripts correspond to positions of proallargtypes not proargtypes"
+	::= { pgsqlPgProcEntry 16 }
+
+pgsqlPgProcProsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This tells the function handler how to invoke the function. It might be the actual source code of the function for interpreted languages, a link symbol, a file name, or just about anything else, depending on the implementation language/call convention"
+	::= { pgsqlPgProcEntry 17 }
+
+pgsqlPgProcProbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Additional information about how to invoke the function. Again, the interpretation is language-specific"
+	::= { pgsqlPgProcEntry 18 }
+
+pgsqlPgProcProacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgProcEntry 19 }
+
+
+---------------------------------------

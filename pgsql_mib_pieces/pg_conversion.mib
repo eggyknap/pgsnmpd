@@ -1,0 +1,95 @@
+pgsqlPgConversionTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgConversionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_conversion describes the available encoding conversion procedures."
+	::= { pgsqlCatalogTables 13 }
+
+pgsqlPgConversionEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgConversionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A conversion entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgConversionEntryOID }
+	::= { pgsqlPgConversionTable 1 }
+
+PgsqlPgConversionEntry ::=
+	SEQUENCE {
+		pgsqlPgConversionEntryOID		INTEGER,
+		pgsqlPgConversionConname		DisplayString,
+		pgsqlPgConversionConnamespace		INTEGER,
+		pgsqlPgConversionConowner		INTEGER,
+		pgsqlPgConversionConforencoding		INTEGER,
+		pgsqlPgConversionContoencoding		INTEGER,
+		pgsqlPgConversionConproc		INTEGER,
+		pgsqlPgConversionCondefault		TruthValue
+	}
+
+pgsqlPgConversionEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgConversionEntry 1 }
+
+pgsqlPgConversionConname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Conversion name (unique within a namespace)"
+	::= { pgsqlPgConversionEntry 2 }
+
+pgsqlPgConversionConnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this conversion"
+	::= { pgsqlPgConversionEntry 3 }
+
+pgsqlPgConversionConowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the conversion"
+	::= { pgsqlPgConversionEntry 4 }
+
+pgsqlPgConversionConforencoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Source encoding ID"
+	::= { pgsqlPgConversionEntry 5 }
+
+pgsqlPgConversionContoencoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Destination encoding ID"
+	::= { pgsqlPgConversionEntry 6 }
+
+pgsqlPgConversionConproc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Conversion procedure"
+	::= { pgsqlPgConversionEntry 7 }
+
+pgsqlPgConversionCondefault			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is the default conversion"
+	::= { pgsqlPgConversionEntry 8 }
+
+
+---------------------------------------

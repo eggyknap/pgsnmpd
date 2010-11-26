@@ -1,0 +1,68 @@
+pgsqlPgOpfamilyTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOpfamilyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_opfamily defines operator families. Each operator family is a collection of operators and associated support routines that implement the semantics specified for a particular index access method. Furthermore, the operators in a family are all 'compatible', in a way that is specified by the access method. The operator family concept allows cross-data-type operators to be used with indexes and to be reasoned about using knowledge of access method semantics."
+	::= { pgsqlCatalogTables 35 }
+
+pgsqlPgOpfamilyEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOpfamilyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_opfamily entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOpfamilyEntryOID }
+	::= { pgsqlPgOpfamilyTable 1 }
+
+PgsqlPgOpfamilyEntry ::=
+	SEQUENCE {
+		pgsqlPgOpfamilyEntryOID		INTEGER,
+		pgsqlPgOpfamilyOpfmethod		INTEGER,
+		pgsqlPgOpfamilyOpfname		DisplayString,
+		pgsqlPgOpfamilyOpfnamespace		INTEGER,
+		pgsqlPgOpfamilyOpfowner		INTEGER
+	}
+
+pgsqlPgOpfamilyEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOpfamilyEntry 1 }
+
+pgsqlPgOpfamilyOpfmethod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator family is for"
+	::= { pgsqlPgOpfamilyEntry 2 }
+
+pgsqlPgOpfamilyOpfname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of this operator family"
+	::= { pgsqlPgOpfamilyEntry 3 }
+
+pgsqlPgOpfamilyOpfnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Namespace of this operator family"
+	::= { pgsqlPgOpfamilyEntry 4 }
+
+pgsqlPgOpfamilyOpfowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator family"
+	::= { pgsqlPgOpfamilyEntry 5 }
+
+
+---------------------------------------

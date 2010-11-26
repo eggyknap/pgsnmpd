@@ -1,0 +1,4481 @@
+  PGSQL-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Counter32, Gauge32, Integer32, enterprises
+          FROM SNMPv2-SMI
+      Float
+          FROM UCD-SNMP-MIB
+      DisplayString, DateAndTime, TruthValue
+          FROM SNMPv2-TC
+      rdbmsDbIndex
+          FROM RDBMS-MIB;
+
+  pgsql MODULE-IDENTITY
+      LAST-UPDATED "200708152113Z"
+      ORGANIZATION "pgsnmpd Development Team"
+      CONTACT-INFO
+              "E-mail: pgsnmpd-devel@pgfoundry.org
+	       WWW: http://pgsnmpd.projects.postgresql.org"
+      DESCRIPTION
+          "MIB to describe a PostgreSQL database"
+
+      ::= { enterprises 27645 }
+
+  pgsqlObjects        OBJECT IDENTIFIER ::= { pgsql 1 }
+
+  pgsnmpdTables		OBJECT IDENTIFIER ::= { pgsqlObjects 1 }
+
+  pgsqlCatalogTables	OBJECT IDENTIFIER ::= { pgsqlObjects 2 }
+
+  ----------------------------------------------------------------
+
+pgsnmpdConnectionsTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsnmpdConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The table of connections this SNMP agent has to PostgreSQL databases"
+	::= { pgsnmpdTables 1 }
+
+pgsnmpdConnectionEntry 		OBJECT-TYPE
+	SYNTAX		PgsnmpdConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A single connection from pgsnmpd to a PostgreSQL database in a
+		database cluster"
+	INDEX	{ pgsnmpdConnID }
+	::= { pgsnmpdConnectionsTable 1 }
+
+PgsnmpdConnectionEntry ::=
+	SEQUENCE {
+		pgsnmpdConnID		INTEGER
+        pgsnmpdConnDesc     DisplayString
+		pgsnmpdConnHost		DisplayString
+		pgsnmpdConnPort		DisplayString
+		pgsnmpdConnDbName	DisplayString
+	}
+
+pgsnmpdConnID		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Identifying integer for this connection."
+	::= { pgsnmpdConnectionEntry 1 }
+
+pgsnmpdConnDesc     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "User-generated decriptive string for this connection."
+    ::= { pgsnmpdConnectionEntry 2 }
+
+pgsnmpdConnHost		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Host name, IP address, or other identifier of the host PostgreSQL server for this connection"
+	::= { pgsnmpdConnectionEntry 3 }
+
+pgsnmpdConnPort		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"PostgreSQL server port number for this connection"
+	::= { pgsnmpdConnectionEntry 4 }
+
+pgsnmpdConnDbName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Name of the database this connection is connected to"
+	::= { pgsnmpdConnectionEntry 5 }
+
+  ----------------------------------------------------------------
+pgsqlPgAggregateTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAggregateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_aggregate stores information about aggregate functions. An aggregate function is a function that operates on a set of values (typically one column from each row that matches a query condition) and returns a single value computed from all these values. Typical aggregate functions are sum, count, and max. Each entry in pg_aggregate is an extension of an entry in pg_proc. The pg_proc entry carries the aggregate's name, input and output data types, and other information that is similar to ordinary functions.The catalog pg_aggregate stores information about aggregate functions. An aggregate function is a function that operates on a set of values (typically one column from each row that matches a query condition) and returns a single value computed from all these values. Typical aggregate functions are sum, count, and max. Each entry in pg_aggregate is an extension of an entry in pg_proc. The pg_proc entry carries the aggregate's name, input and output data types, and other information that is similar to ordinary functions."
+	::= { pgsqlCatalogTables 1 }
+
+pgsqlPgAggregateEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAggregateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A pg_aggregate entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAggregateEntryOID }
+	::= { pgsqlPgAggregateTable 1 }
+
+PgsqlPgAggregateEntry ::=
+	SEQUENCE {
+		pgsqlPgAggregateEntryOID		INTEGER,
+		pgsqlPgAggregateAggfnoid		INTEGER,
+		pgsqlPgAggregateAggtransfn		INTEGER,
+		pgsqlPgAggregateAggfinalfn		INTEGER,
+		pgsqlPgAggregateAggsortop		INTEGER,
+		pgsqlPgAggregateAggtranstype		INTEGER,
+		pgsqlPgAggregateAgginitval		DisplayString
+	}
+
+pgsqlPgAggregateEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAggregateEntry 1 }
+
+pgsqlPgAggregateAggfnoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"pg_proc OID of the aggregate function"
+	::= { pgsqlPgAggregateEntry 2 }
+
+pgsqlPgAggregateAggtransfn			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Transition function"
+	::= { pgsqlPgAggregateEntry 3 }
+
+pgsqlPgAggregateAggfinalfn			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Final function (zero if none)"
+	::= { pgsqlPgAggregateEntry 4 }
+
+pgsqlPgAggregateAggsortop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Associated sort operator (zero if none)"
+	::= { pgsqlPgAggregateEntry 5 }
+
+pgsqlPgAggregateAggtranstype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type of the aggregate function's internal transition (state) data"
+	::= { pgsqlPgAggregateEntry 6 }
+
+pgsqlPgAggregateAgginitval			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The initial value of the transition state. This is a text field containing the initial value in its external string representation. If this field is NULL, the transition state value starts out NULL"
+	::= { pgsqlPgAggregateEntry 7 }
+
+
+---------------------------------------
+pgsqlPgAmTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_am stores information about index access methods. There is one row for each index access method supported by the system."
+	::= { pgsqlCatalogTables 2 }
+
+pgsqlPgAmEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An access method"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmEntryOID }
+	::= { pgsqlPgAmTable 1 }
+
+PgsqlPgAmEntry ::=
+	SEQUENCE {
+		pgsqlPgAmEntryOID		INTEGER,
+		pgsqlPgAmAmname		DisplayString,
+		pgsqlPgAmAmstrategies		INTEGER,
+		pgsqlPgAmAmsupport		INTEGER,
+		pgsqlPgAmAmorderstrategy		INTEGER,
+		pgsqlPgAmAmcanunique		TruthValue,
+		pgsqlPgAmAmcanmulticol		TruthValue,
+		pgsqlPgAmAmoptionalkey		TruthValue,
+		pgsqlPgAmAmindexnulls		TruthValue,
+		pgsqlPgAmAmstorage		TruthValue,
+		pgsqlPgAmAmclusterable		TruthValue,
+		pgsqlPgAmAminsert		INTEGER,
+		pgsqlPgAmAmbeginscan		INTEGER,
+		pgsqlPgAmAmgettuple		INTEGER,
+		pgsqlPgAmAmgetmulti		INTEGER,
+		pgsqlPgAmAmrescan		INTEGER,
+		pgsqlPgAmAmendscan		INTEGER,
+		pgsqlPgAmAmmarkpos		INTEGER,
+		pgsqlPgAmAmrestrpos		INTEGER,
+		pgsqlPgAmAmbuild		INTEGER,
+		pgsqlPgAmAmbulkdelete		INTEGER,
+		pgsqlPgAmAmvacuumcleanup		INTEGER,
+		pgsqlPgAmAmcostestimate		INTEGER,
+		pgsqlPgAmAmoptions		INTEGER
+	}
+
+pgsqlPgAmEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmEntry 1 }
+
+pgsqlPgAmAmname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the access method"
+	::= { pgsqlPgAmEntry 2 }
+
+pgsqlPgAmAmstrategies			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of operator strategies for this access method"
+	::= { pgsqlPgAmEntry 3 }
+
+pgsqlPgAmAmsupport			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of support routines for this access method"
+	::= { pgsqlPgAmEntry 4 }
+
+pgsqlPgAmAmorderstrategy			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Zero if the index offers no sort order, otherwise the strategy number of the strategy operator that describes the sort order"
+	::= { pgsqlPgAmEntry 5 }
+
+pgsqlPgAmAmcanunique			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support unique indexes?"
+	::= { pgsqlPgAmEntry 6 }
+
+pgsqlPgAmAmcanmulticol			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support multicolumn indexes?"
+	::= { pgsqlPgAmEntry 7 }
+
+pgsqlPgAmAmoptionalkey			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support a scan without any constraint for the first index column?"
+	::= { pgsqlPgAmEntry 8 }
+
+pgsqlPgAmAmindexnulls			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Does the access method support null index entries?"
+	::= { pgsqlPgAmEntry 9 }
+
+pgsqlPgAmAmstorage			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Can index storage data type differ from column data type?"
+	::= { pgsqlPgAmEntry 10 }
+
+pgsqlPgAmAmclusterable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Can an index of this type be clustered on?"
+	::= { pgsqlPgAmEntry 11 }
+
+pgsqlPgAmAminsert			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Insert this tuple"
+	::= { pgsqlPgAmEntry 12 }
+
+pgsqlPgAmAmbeginscan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Start new scan"
+	::= { pgsqlPgAmEntry 13 }
+
+pgsqlPgAmAmgettuple			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Next valid tuple"
+	::= { pgsqlPgAmEntry 14 }
+
+pgsqlPgAmAmgetmulti			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Fetch multiple tuples"
+	::= { pgsqlPgAmEntry 15 }
+
+pgsqlPgAmAmrescan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restart this scan"
+	::= { pgsqlPgAmEntry 16 }
+
+pgsqlPgAmAmendscan			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"End this scan"
+	::= { pgsqlPgAmEntry 17 }
+
+pgsqlPgAmAmmarkpos			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Mark current scan position"
+	::= { pgsqlPgAmEntry 18 }
+
+pgsqlPgAmAmrestrpos			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restore marked scan position"
+	::= { pgsqlPgAmEntry 19 }
+
+pgsqlPgAmAmbuild			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Build new index"
+	::= { pgsqlPgAmEntry 20 }
+
+pgsqlPgAmAmbulkdelete			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Bulk-delete function"
+	::= { pgsqlPgAmEntry 21 }
+
+pgsqlPgAmAmvacuumcleanup			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Post- VACUUM cleanup function"
+	::= { pgsqlPgAmEntry 22 }
+
+pgsqlPgAmAmcostestimate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function to estimate cost of an index scan"
+	::= { pgsqlPgAmEntry 23 }
+
+pgsqlPgAmAmoptions			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function to parse and validate reloptions for an index"
+	::= { pgsqlPgAmEntry 24 }
+
+
+---------------------------------------
+pgsqlPgAmopTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmopEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_amop stores information about operators associated with index access method operator classes. There is one row for each operator that is a member of an operator class."
+	::= { pgsqlCatalogTables 3 }
+
+pgsqlPgAmopEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmopEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_amop entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmopEntryOID }
+	::= { pgsqlPgAmopTable 1 }
+
+PgsqlPgAmopEntry ::=
+	SEQUENCE {
+		pgsqlPgAmopEntryOID		INTEGER,
+		pgsqlPgAmopAmopfamily		INTEGER,
+		pgsqlPgAmopAmoplefttype		INTEGER,
+		pgsqlPgAmopAmoprighttype		INTEGER,
+		pgsqlPgAmopAmopstrategy		INTEGER,
+		pgsqlPgAmopAmopreqcheck		TruthValue,
+		pgsqlPgAmopAmopopr		INTEGER,
+		pgsqlPgAmopAmopmethod		INTEGER
+	}
+
+pgsqlPgAmopEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmopEntry 1 }
+
+pgsqlPgAmopAmopfamily			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The operator family this entry is for"
+	::= { pgsqlPgAmopEntry 2 }
+
+pgsqlPgAmopAmoplefttype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Left-hand input data type of operator"
+	::= { pgsqlPgAmopEntry 3 }
+
+pgsqlPgAmopAmoprighttype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Right-hand input data type of operator"
+	::= { pgsqlPgAmopEntry 4 }
+
+pgsqlPgAmopAmopstrategy			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Operator strategy number"
+	::= { pgsqlPgAmopEntry 5 }
+
+pgsqlPgAmopAmopreqcheck			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index hit must be rechecked"
+	::= { pgsqlPgAmopEntry 6 }
+
+pgsqlPgAmopAmopopr			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the operator"
+	::= { pgsqlPgAmopEntry 7 }
+
+pgsqlPgAmopAmopmethod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator family is for"
+	::= { pgsqlPgAmopEntry 8 }
+
+
+---------------------------------------
+pgsqlPgAmprocTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmprocEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_amproc stores information about support procedures associated with index access method operator classes. There is one row for each support procedure belonging to an operator class."
+	::= { pgsqlCatalogTables 4 }
+
+pgsqlPgAmprocEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmprocEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_amproc entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmprocEntryOID }
+	::= { pgsqlPgAmprocTable 1 }
+
+PgsqlPgAmprocEntry ::=
+	SEQUENCE {
+		pgsqlPgAmprocEntryOID		INTEGER,
+		pgsqlPgAmprocAmopclaid		INTEGER,
+		pgsqlPgAmprocAmprocsubtype		INTEGER,
+		pgsqlPgAmprocAmprocnum		INTEGER,
+		pgsqlPgAmprocAmproc		INTEGER
+	}
+
+pgsqlPgAmprocEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmprocEntry 1 }
+
+pgsqlPgAmprocAmopclaid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The index operator class this entry is for"
+	::= { pgsqlPgAmprocEntry 2 }
+
+pgsqlPgAmprocAmprocsubtype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Subtype, if cross-type routine, else zero"
+	::= { pgsqlPgAmprocEntry 3 }
+
+pgsqlPgAmprocAmprocnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Support procedure number"
+	::= { pgsqlPgAmprocEntry 4 }
+
+pgsqlPgAmprocAmproc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the procedure"
+	::= { pgsqlPgAmprocEntry 5 }
+
+
+---------------------------------------
+pgsqlPgAttrdefTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAttrdefEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_attrdef stores column default values. The main information about columns is stored in pg_attribute (see below). Only columns that explicitly specify a default value (when the table is created or the column is added) will have an entry here."
+	::= { pgsqlCatalogTables 5 }
+
+pgsqlPgAttrdefEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAttrdefEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_attrdef entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAttrdefEntryOID }
+	::= { pgsqlPgAttrdefTable 1 }
+
+PgsqlPgAttrdefEntry ::=
+	SEQUENCE {
+		pgsqlPgAttrdefEntryOID		INTEGER,
+		pgsqlPgAttrdefAdrelid		INTEGER,
+		pgsqlPgAttrdefAdnum		INTEGER,
+		pgsqlPgAttrdefAdbin		DisplayString,
+		pgsqlPgAttrdefAdsrc		DisplayString
+	}
+
+pgsqlPgAttrdefEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAttrdefEntry 1 }
+
+pgsqlPgAttrdefAdrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this column belongs to"
+	::= { pgsqlPgAttrdefEntry 2 }
+
+pgsqlPgAttrdefAdnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the column"
+	::= { pgsqlPgAttrdefEntry 3 }
+
+pgsqlPgAttrdefAdbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The internal representation of the column default value"
+	::= { pgsqlPgAttrdefEntry 4 }
+
+pgsqlPgAttrdefAdsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A human-readable representation of the default value"
+	::= { pgsqlPgAttrdefEntry 5 }
+
+
+---------------------------------------
+pgsqlPgAttributeTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAttributeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_attribute stores information about table columns. There will be exactly one pg_attribute row for every column in every table in the database. (There will also be attribute entries for indexes, and indeed all objects that have pg_class entries.) The term attribute is equivalent to column and is used for historical reasons."
+	::= { pgsqlCatalogTables 6 }
+
+pgsqlPgAttributeEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAttributeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_attribute entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAttributeEntryOID }
+	::= { pgsqlPgAttributeTable 1 }
+
+PgsqlPgAttributeEntry ::=
+	SEQUENCE {
+		pgsqlPgAttributeEntryOID		INTEGER,
+		pgsqlPgAttributeAttrelid		INTEGER,
+		pgsqlPgAttributeAttname		DisplayString,
+		pgsqlPgAttributeAtttypid		INTEGER,
+		pgsqlPgAttributeAttstattarget		INTEGER,
+		pgsqlPgAttributeAttlen		INTEGER,
+		pgsqlPgAttributeAttnum		INTEGER,
+		pgsqlPgAttributeAttndims		INTEGER,
+		pgsqlPgAttributeAttcacheoff		INTEGER,
+		pgsqlPgAttributeAtttypmod		INTEGER,
+		pgsqlPgAttributeAttbyval		TruthValue,
+		pgsqlPgAttributeAttstorage		DisplayString,
+		pgsqlPgAttributeAttalign		DisplayString,
+		pgsqlPgAttributeAttnotnull		TruthValue,
+		pgsqlPgAttributeAtthasdef		TruthValue,
+		pgsqlPgAttributeAttisdropped		TruthValue,
+		pgsqlPgAttributeAttislocal		INTEGER,
+		pgsqlPgAttributeAttinhcount		INTEGER
+	}
+
+pgsqlPgAttributeEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAttributeEntry 1 }
+
+pgsqlPgAttributeAttrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this column belongs to"
+	::= { pgsqlPgAttributeEntry 2 }
+
+pgsqlPgAttributeAttname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The column name"
+	::= { pgsqlPgAttributeEntry 3 }
+
+pgsqlPgAttributeAtttypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The data type of this column"
+	::= { pgsqlPgAttributeEntry 4 }
+
+pgsqlPgAttributeAttstattarget			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"attstattarget controls the level of detail of statistics accumulated for this column by ANALYZE . A zero value indicates that no statistics should be collected. A negative value says to use the system default statistics target. The exact meaning of positive values is data type-dependent. For scalar data types, attstattarget is both the target number of "
+	::= { pgsqlPgAttributeEntry 5 }
+
+pgsqlPgAttributeAttlen			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typlen of this column's type"
+	::= { pgsqlPgAttributeEntry 6 }
+
+pgsqlPgAttributeAttnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the column. Ordinary columns are numbered from 1 up. System columns, such as oid , have (arbitrary) negative numbers"
+	::= { pgsqlPgAttributeEntry 7 }
+
+pgsqlPgAttributeAttndims			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of dimensions, if the column is an array type; otherwise 0. (Presently, the number of dimensions of an array is not enforced, so any nonzero value effectively means "
+	::= { pgsqlPgAttributeEntry 8 }
+
+pgsqlPgAttributeAttcacheoff			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Always -1 in storage, but when loaded into a row descriptor in memory this may be updated to cache the offset of the attribute within the row"
+	::= { pgsqlPgAttributeEntry 9 }
+
+pgsqlPgAttributeAtttypmod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"atttypmod records type-specific data supplied at table creation time (for example, the maximum length of a varchar column). It is passed to type-specific input functions and length coercion functions. The value will generally be -1 for types that do not need atttypmod"
+	::= { pgsqlPgAttributeEntry 10 }
+
+pgsqlPgAttributeAttbyval			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typbyval of this column's type"
+	::= { pgsqlPgAttributeEntry 11 }
+
+pgsqlPgAttributeAttstorage			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Normally a copy of pg_type.typstorage of this column's type. For TOAST-able data types, this can be altered after column creation to control storage policy"
+	::= { pgsqlPgAttributeEntry 12 }
+
+pgsqlPgAttributeAttalign			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typalign of this column's type"
+	::= { pgsqlPgAttributeEntry 13 }
+
+pgsqlPgAttributeAttnotnull			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This represents a not-null constraint. It is possible to change this column to enable or disable the constraint"
+	::= { pgsqlPgAttributeEntry 14 }
+
+pgsqlPgAttributeAtthasdef			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column has a default value, in which case there will be a corresponding entry in the pg_attrdef catalog that actually defines the value"
+	::= { pgsqlPgAttributeEntry 15 }
+
+pgsqlPgAttributeAttisdropped			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column has been dropped and is no longer valid. A dropped column is still physically present in the table, but is ignored by the parser and so cannot be accessed via SQL"
+	::= { pgsqlPgAttributeEntry 16 }
+
+pgsqlPgAttributeAttislocal			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column is defined locally in the relation. Note that a column may be locally defined and inherited simultaneously"
+	::= { pgsqlPgAttributeEntry 17 }
+
+pgsqlPgAttributeAttinhcount			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of direct ancestors this column has. A column with a nonzero number of ancestors cannot be dropped nor renamed"
+	::= { pgsqlPgAttributeEntry 18 }
+
+
+---------------------------------------
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgAuthMembersTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAuthMembersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_auth_members shows the membership relations between roles. Any non-circular set of relationships is allowed. Because user identities are cluster-wide, pg_auth_members is shared across all databases of a cluster: there is only one copy of pg_auth_members per cluster, not one per database."
+	::= { pgsqlCatalogTables 8 }
+
+pgsqlPgAuthMembersEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAuthMembersEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_auth_members entry"
+	INDEX  { pgsnmpdConnID, pgsqlPgAuthMembersEntryOID }
+	::= { pgsqlPgAuthMembersTable 1 }
+
+PgsqlPgAuthMembersEntry ::=
+	SEQUENCE {
+		pgsqlPgAuthMembersEntryOID		INTEGER,
+		pgsqlPgAuthMembersRoleid		INTEGER,
+		pgsqlPgAuthMembersMember		INTEGER,
+		pgsqlPgAuthMembersGrantor		INTEGER,
+		pgsqlPgAuthMembersAdminOption		TruthValue
+	}
+
+pgsqlPgAuthMembersEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAuthMembersEntry 1 }
+
+pgsqlPgAuthMembersRoleid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of a role that has a member"
+	::= { pgsqlPgAuthMembersEntry 2 }
+
+pgsqlPgAuthMembersMember			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of a role that is a member of roleid"
+	::= { pgsqlPgAuthMembersEntry 3 }
+
+pgsqlPgAuthMembersGrantor			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ID of the role that granted this membership"
+	::= { pgsqlPgAuthMembersEntry 4 }
+
+pgsqlPgAuthMembersAdminOption			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if member may grant membership in roleid to others"
+	::= { pgsqlPgAuthMembersEntry 5 }
+
+
+---------------------------------------
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgAuthidTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAuthidEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_authid contains information about database authorization identifiers (roles). A role subsumes the concepts of 'users' and 'groups'. A user is essentially just a role with the rolcanlogin flag set. Any role (with or without rolcanlogin) may have other roles as members; see pg_auth_members. Since this catalog contains passwords, it must not be publicly readable. pg_roles is a publicly readable view on pg_authid that blanks out the password field. Because user identities are cluster-wide, pg_authid is shared across all databases of a cluster: there is only one copy of pg_authid per cluster, not one per database."
+	::= { pgsqlCatalogTables 7 }
+
+pgsqlPgAuthidEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAuthidEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_authid entry"
+	INDEX  { pgsnmpdConnID, pgsqlPgAuthidEntryOID }
+	::= { pgsqlPgAuthidTable 1 }
+
+PgsqlPgAuthidEntry ::=
+	SEQUENCE {
+		pgsqlPgAuthidEntryOID		INTEGER,
+		pgsqlPgAuthidRolname		INTEGER,
+		pgsqlPgAuthidRolsuper		TruthValue,
+		pgsqlPgAuthidRolinherit		TruthValue,
+		pgsqlPgAuthidRolcreaterole		TruthValue,
+		pgsqlPgAuthidRolcreatedb		TruthValue,
+		pgsqlPgAuthidRolcatupdate		TruthValue,
+		pgsqlPgAuthidRolcanlogin		TruthValue,
+		pgsqlPgAuthidRolconnlimit		INTEGER,
+		pgsqlPgAuthidRolpassword		DisplayString,
+		pgsqlPgAuthidRolvaliduntil		DateAndTime,
+		pgsqlPgAuthidRolconfig		DisplayString
+	}
+
+pgsqlPgAuthidEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAuthidEntry 1 }
+
+pgsqlPgAuthidRolname			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role name"
+	::= { pgsqlPgAuthidEntry 2 }
+
+pgsqlPgAuthidRolsuper			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role has superuser privileges"
+	::= { pgsqlPgAuthidEntry 3 }
+
+pgsqlPgAuthidRolinherit			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role automatically inherits privileges of roles it is a member of"
+	::= { pgsqlPgAuthidEntry 4 }
+
+pgsqlPgAuthidRolcreaterole			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may create more roles"
+	::= { pgsqlPgAuthidEntry 5 }
+
+pgsqlPgAuthidRolcreatedb			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may create databases"
+	::= { pgsqlPgAuthidEntry 6 }
+
+pgsqlPgAuthidRolcatupdate			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may update system catalogs directly. (Even a superuser may not do this unless this column is true)"
+	::= { pgsqlPgAuthidEntry 7 }
+
+pgsqlPgAuthidRolcanlogin			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may log in. That is, this role can be given as the initial session authorization identifier"
+	::= { pgsqlPgAuthidEntry 8 }
+
+pgsqlPgAuthidRolconnlimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For roles that can log in, this sets maximum number of concurrent connections this role can make. -1 means no limit"
+	::= { pgsqlPgAuthidEntry 9 }
+
+pgsqlPgAuthidRolpassword			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Password (possibly encrypted); NULL if none"
+	::= { pgsqlPgAuthidEntry 10 }
+
+pgsqlPgAuthidRolvaliduntil			OBJECT-TYPE
+	SYNTAX		DateAndTime
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Password expiry time (only used for password authentication); NULL if no expiration"
+	::= { pgsqlPgAuthidEntry 11 }
+
+pgsqlPgAuthidRolconfig			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Session defaults for run-time configuration variables"
+	::= { pgsqlPgAuthidEntry 12 }
+
+
+---------------------------------------
+pgsqlPgAutovacuumTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAutovacuumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_autovacuum stores optional per-relation configuration parameters for the autovacuum daemon. If there is an entry here for a particular relation, the given parameters will be used for autovacuuming that table. If no entry is present, the system-wide defaults will be used."
+	::= { pgsqlCatalogTables 9 }
+
+pgsqlPgAutovacuumEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAutovacuumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Autovacuum settings for a relation"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAutovacuumEntryOID }
+	::= { pgsqlPgAutovacuumTable 1 }
+
+PgsqlPgAutovacuumEntry ::=
+	SEQUENCE {
+		pgsqlPgAutovacuumEntryOID		INTEGER,
+		pgsqlPgAutovacuumVacrelid		INTEGER,
+		pgsqlPgAutovacuumEnabled		TruthValue,
+		pgsqlPgAutovacuumVacBaseThresh		INTEGER,
+		pgsqlPgAutovacuumVacScaleFactor		Float,
+		pgsqlPgAutovacuumAnlBaseThresh		INTEGER,
+		pgsqlPgAutovacuumAnlScaleFactor		Float,
+		pgsqlPgAutovacuumVacCostDelay		INTEGER,
+		pgsqlPgAutovacuumVacCostLimit		INTEGER,
+		pgsqlPgAutovacuumFreezeMinAge		INTEGER,
+		pgsqlPgAutovacuumFreezeMaxAge		INTEGER
+	}
+
+pgsqlPgAutovacuumEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAutovacuumEntry 1 }
+
+pgsqlPgAutovacuumVacrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this entry is for"
+	::= { pgsqlPgAutovacuumEntry 2 }
+
+pgsqlPgAutovacuumEnabled			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If false, this table is never autovacuumed"
+	::= { pgsqlPgAutovacuumEntry 3 }
+
+pgsqlPgAutovacuumVacBaseThresh			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Minimum number of modified tuples before vacuum"
+	::= { pgsqlPgAutovacuumEntry 4 }
+
+pgsqlPgAutovacuumVacScaleFactor			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Multiplier for reltuples to add to vac_base_thresh"
+	::= { pgsqlPgAutovacuumEntry 5 }
+
+pgsqlPgAutovacuumAnlBaseThresh			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Minimum number of modified tuples before analyze"
+	::= { pgsqlPgAutovacuumEntry 6 }
+
+pgsqlPgAutovacuumAnlScaleFactor			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Multiplier for reltuples to add to anl_base_thresh"
+	::= { pgsqlPgAutovacuumEntry 7 }
+
+pgsqlPgAutovacuumVacCostDelay			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_cost_delay parameter"
+	::= { pgsqlPgAutovacuumEntry 8 }
+
+pgsqlPgAutovacuumVacCostLimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_cost_limit parameter"
+	::= { pgsqlPgAutovacuumEntry 9 }
+
+pgsqlPgAutovacuumFreezeMinAge			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom vacuum_freeze_min_age parameter"
+	::= { pgsqlPgAutovacuumEntry 10 }
+
+pgsqlPgAutovacuumFreezeMaxAge			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom autovacuum_freeze_max_age parameter"
+	::= { pgsqlPgAutovacuumEntry 11 }
+
+
+---------------------------------------
+pgsqlPgCastTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgCastEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_cast stores data type conversion paths, both built-in paths and those defined with CREATE CAST."
+	::= { pgsqlCatalogTables 10 }
+
+pgsqlPgCastEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgCastEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_cast entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgCastEntryOID }
+	::= { pgsqlPgCastTable 1 }
+
+PgsqlPgCastEntry ::=
+	SEQUENCE {
+		pgsqlPgCastEntryOID		INTEGER,
+		pgsqlPgCastCastsource		INTEGER,
+		pgsqlPgCastCasttarget		INTEGER,
+		pgsqlPgCastCastfunc		INTEGER,
+		pgsqlPgCastCastcontext		DisplayString
+	}
+
+pgsqlPgCastEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgCastEntry 1 }
+
+pgsqlPgCastCastsource			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the source data type"
+	::= { pgsqlPgCastEntry 2 }
+
+pgsqlPgCastCasttarget			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the target data type"
+	::= { pgsqlPgCastEntry 3 }
+
+pgsqlPgCastCastfunc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the function to use to perform this cast. Zero is stored if the data types are binary compatible (that is, no run-time operation is needed to perform the cast)"
+	::= { pgsqlPgCastEntry 4 }
+
+pgsqlPgCastCastcontext			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates what contexts the cast may be invoked in. e means only as an explicit cast (using CAST or :: syntax). a means implicitly in assignment to a target column, as well as explicitly. i means implicitly in expressions, as well as the other cases"
+	::= { pgsqlPgCastEntry 5 }
+
+
+---------------------------------------
+pgsqlPgClassTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgClassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_class catalogs tables and most everything else that has columns or is otherwise similar to a table. This includes indexes (but see also pg_index), sequences, views, composite types, and TOAST tables; see relkind. Below, when we mean all of these kinds of objects we speak of 'relations'. Not all columns are meaningful for all relation types."
+	::= { pgsqlCatalogTables 11 }
+
+pgsqlPgClassEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgClassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_class entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgClassEntryOID }
+	::= { pgsqlPgClassTable 1 }
+
+PgsqlPgClassEntry ::=
+	SEQUENCE {
+		pgsqlPgClassEntryOID		INTEGER,
+		pgsqlPgClassRelname		DisplayString,
+		pgsqlPgClassRelnamespace		INTEGER,
+		pgsqlPgClassReltype		INTEGER,
+		pgsqlPgClassRelowner		INTEGER,
+		pgsqlPgClassRelam		INTEGER,
+		pgsqlPgClassRelfilenode		INTEGER,
+		pgsqlPgClassReltablespace		INTEGER,
+		pgsqlPgClassRelpages		INTEGER,
+		pgsqlPgClassReltuples		Float,
+		pgsqlPgClassReltoastrelid		INTEGER,
+		pgsqlPgClassReltoastidxid		INTEGER,
+		pgsqlPgClassRelhasindex		TruthValue,
+		pgsqlPgClassRelisshared		TruthValue,
+		pgsqlPgClassRelkind		DisplayString,
+		pgsqlPgClassRelnatts		INTEGER,
+		pgsqlPgClassRelchecks		INTEGER,
+		pgsqlPgClassReltriggers		INTEGER,
+		pgsqlPgClassRelukeys		INTEGER,
+		pgsqlPgClassRelfkeys		INTEGER,
+		pgsqlPgClassRelrefs		INTEGER,
+		pgsqlPgClassRelhasoids		TruthValue,
+		pgsqlPgClassRelhaspkey		TruthValue,
+		pgsqlPgClassRelhasrules		TruthValue,
+		pgsqlPgClassRelhassubclass		TruthValue,
+		pgsqlPgClassRelfrozenxid		INTEGER,
+		pgsqlPgClassRelacl		DisplayString,
+		pgsqlPgClassReloptions		DisplayString
+	}
+
+pgsqlPgClassEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgClassEntry 1 }
+
+pgsqlPgClassRelname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the table, index, view, etc."
+	::= { pgsqlPgClassEntry 2 }
+
+pgsqlPgClassRelnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this relation"
+	::= { pgsqlPgClassEntry 3 }
+
+pgsqlPgClassReltype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the data type that corresponds to this table's row type, if any (zero for indexes, which have no pg_type entry)"
+	::= { pgsqlPgClassEntry 4 }
+
+pgsqlPgClassRelowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the relation"
+	::= { pgsqlPgClassEntry 5 }
+
+pgsqlPgClassRelam			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is an index, the access method used (B-tree, hash, etc.)"
+	::= { pgsqlPgClassEntry 6 }
+
+pgsqlPgClassRelfilenode			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the on-disk file of this relation; 0 if none"
+	::= { pgsqlPgClassEntry 7 }
+
+pgsqlPgClassReltablespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The tablespace in which this relation is stored. If zero, the database's default tablespace is implied. (Not meaningful if the relation has no on-disk file.)"
+	::= { pgsqlPgClassEntry 8 }
+
+pgsqlPgClassRelpages			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Size of the on-disk representation of this table in pages (of size BLCKSZ ). This is only an estimate used by the planner. It is updated by VACUUM , ANALYZE , and a few DDL commands such as CREATE INDEX"
+	::= { pgsqlPgClassEntry 9 }
+
+pgsqlPgClassReltuples			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of rows in the table. This is only an estimate used by the planner. It is updated by VACUUM , ANALYZE , and a few DDL commands such as CREATE INDEX"
+	::= { pgsqlPgClassEntry 10 }
+
+pgsqlPgClassReltoastrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the TOAST table associated with this table, 0 if none. The TOAST table stores large attributes "
+	::= { pgsqlPgClassEntry 11 }
+
+pgsqlPgClassReltoastidxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a TOAST table, the OID of its index. 0 if not a TOAST table"
+	::= { pgsqlPgClassEntry 12 }
+
+pgsqlPgClassRelhasindex			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is a table and it has (or recently had) any indexes. This is set by CREATE INDEX , but not cleared immediately by DROP INDEX . VACUUM clears relhasindex if it finds the table has no indexes"
+	::= { pgsqlPgClassEntry 13 }
+
+pgsqlPgClassRelisshared			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this table is shared across all databases in the cluster. Only certain system catalogs (such as pg_database ) are shared"
+	::= { pgsqlPgClassEntry 14 }
+
+pgsqlPgClassRelkind			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"r = ordinary table, i = index, S = sequence, v = view, c = composite type, t = TOAST table"
+	::= { pgsqlPgClassEntry 15 }
+
+pgsqlPgClassRelnatts			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of user columns in the relation (system columns not counted). There must be this many corresponding entries in pg_attribute . See also pg_attribute.attnum"
+	::= { pgsqlPgClassEntry 16 }
+
+pgsqlPgClassRelchecks			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of check constraints on the table; see pg_constraint catalog"
+	::= { pgsqlPgClassEntry 17 }
+
+pgsqlPgClassReltriggers			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of triggers on the table; see pg_trigger catalog"
+	::= { pgsqlPgClassEntry 18 }
+
+pgsqlPgClassRelukeys			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused ( not the number of unique keys)"
+	::= { pgsqlPgClassEntry 19 }
+
+pgsqlPgClassRelfkeys			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused ( not the number of foreign keys on the table)"
+	::= { pgsqlPgClassEntry 20 }
+
+pgsqlPgClassRelrefs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Unused"
+	::= { pgsqlPgClassEntry 21 }
+
+pgsqlPgClassRelhasoids			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if we generate an OID for each row of the relation"
+	::= { pgsqlPgClassEntry 22 }
+
+pgsqlPgClassRelhaspkey			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the table has (or once had) a primary key"
+	::= { pgsqlPgClassEntry 23 }
+
+pgsqlPgClassRelhasrules			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if table has rules; see pg_rewrite catalog"
+	::= { pgsqlPgClassEntry 24 }
+
+pgsqlPgClassRelhassubclass			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if table has (or once had) any inheritance children"
+	::= { pgsqlPgClassEntry 25 }
+
+pgsqlPgClassRelfrozenxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"All transaction IDs before this one have been replaced with a permanent ( "
+	::= { pgsqlPgClassEntry 26 }
+
+pgsqlPgClassRelacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgClassEntry 27 }
+
+pgsqlPgClassReloptions			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access-method-specific options, as "
+	::= { pgsqlPgClassEntry 28 }
+
+
+---------------------------------------
+pgsqlPgConstraintTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgConstraintEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_constraint stores check, primary key, unique, and foreign key constraints on tables. (Column constraints are not treated specially. Every column constraint is equivalent to some table constraint.) Not-null constraints are represented in the pg_attribute catalog."
+	::= { pgsqlCatalogTables 12 }
+
+pgsqlPgConstraintEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgConstraintEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A constraint entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgConstraintEntryOID }
+	::= { pgsqlPgConstraintTable 1 }
+
+PgsqlPgConstraintEntry ::=
+	SEQUENCE {
+		pgsqlPgConstraintEntryOID		INTEGER,
+		pgsqlPgConstraintConname		DisplayString,
+		pgsqlPgConstraintConnamespace		INTEGER,
+		pgsqlPgConstraintContype		DisplayString,
+		pgsqlPgConstraintCondeferrable		TruthValue,
+		pgsqlPgConstraintCondeferred		TruthValue,
+		pgsqlPgConstraintConrelid		INTEGER,
+		pgsqlPgConstraintContypid		INTEGER,
+		pgsqlPgConstraintConfrelid		INTEGER,
+		pgsqlPgConstraintConfupdtype		DisplayString,
+		pgsqlPgConstraintConfdeltype		DisplayString,
+		pgsqlPgConstraintConfmatchtype		DisplayString,
+		pgsqlPgConstraintConkey		DisplayString,
+		pgsqlPgConstraintConfkey		DisplayString,
+		pgsqlPgConstraintConbin		DisplayString,
+		pgsqlPgConstraintConsrc		DisplayString
+	}
+
+pgsqlPgConstraintEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgConstraintEntry 1 }
+
+pgsqlPgConstraintConname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Constraint name (not necessarily unique!)"
+	::= { pgsqlPgConstraintEntry 2 }
+
+pgsqlPgConstraintConnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this constraint"
+	::= { pgsqlPgConstraintEntry 3 }
+
+pgsqlPgConstraintContype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"c = check constraint, f = foreign key constraint, p = primary key constraint, u = unique constraint"
+	::= { pgsqlPgConstraintEntry 4 }
+
+pgsqlPgConstraintCondeferrable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Is the constraint deferrable?"
+	::= { pgsqlPgConstraintEntry 5 }
+
+pgsqlPgConstraintCondeferred			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Is the constraint deferred by default?"
+	::= { pgsqlPgConstraintEntry 6 }
+
+pgsqlPgConstraintConrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this constraint is on; 0 if not a table constraint"
+	::= { pgsqlPgConstraintEntry 7 }
+
+pgsqlPgConstraintContypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The domain this constraint is on; 0 if not a domain constraint"
+	::= { pgsqlPgConstraintEntry 8 }
+
+pgsqlPgConstraintConfrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a foreign key, the referenced table; else 0"
+	::= { pgsqlPgConstraintEntry 9 }
+
+pgsqlPgConstraintConfupdtype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key update action code"
+	::= { pgsqlPgConstraintEntry 10 }
+
+pgsqlPgConstraintConfdeltype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key deletion action code"
+	::= { pgsqlPgConstraintEntry 11 }
+
+pgsqlPgConstraintConfmatchtype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Foreign key match type"
+	::= { pgsqlPgConstraintEntry 12 }
+
+pgsqlPgConstraintConkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a table constraint, list of columns which the constraint constrains"
+	::= { pgsqlPgConstraintEntry 13 }
+
+pgsqlPgConstraintConfkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a foreign key, list of the referenced columns"
+	::= { pgsqlPgConstraintEntry 14 }
+
+pgsqlPgConstraintConbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a check constraint, an internal representation of the expression"
+	::= { pgsqlPgConstraintEntry 15 }
+
+pgsqlPgConstraintConsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If a check constraint, a human-readable representation of the expression"
+	::= { pgsqlPgConstraintEntry 16 }
+
+
+---------------------------------------
+pgsqlPgConversionTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgConversionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_conversion describes the available encoding conversion procedures."
+	::= { pgsqlCatalogTables 13 }
+
+pgsqlPgConversionEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgConversionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A conversion entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgConversionEntryOID }
+	::= { pgsqlPgConversionTable 1 }
+
+PgsqlPgConversionEntry ::=
+	SEQUENCE {
+		pgsqlPgConversionEntryOID		INTEGER,
+		pgsqlPgConversionConname		DisplayString,
+		pgsqlPgConversionConnamespace		INTEGER,
+		pgsqlPgConversionConowner		INTEGER,
+		pgsqlPgConversionConforencoding		INTEGER,
+		pgsqlPgConversionContoencoding		INTEGER,
+		pgsqlPgConversionConproc		INTEGER,
+		pgsqlPgConversionCondefault		TruthValue
+	}
+
+pgsqlPgConversionEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgConversionEntry 1 }
+
+pgsqlPgConversionConname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Conversion name (unique within a namespace)"
+	::= { pgsqlPgConversionEntry 2 }
+
+pgsqlPgConversionConnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this conversion"
+	::= { pgsqlPgConversionEntry 3 }
+
+pgsqlPgConversionConowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the conversion"
+	::= { pgsqlPgConversionEntry 4 }
+
+pgsqlPgConversionConforencoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Source encoding ID"
+	::= { pgsqlPgConversionEntry 5 }
+
+pgsqlPgConversionContoencoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Destination encoding ID"
+	::= { pgsqlPgConversionEntry 6 }
+
+pgsqlPgConversionConproc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Conversion procedure"
+	::= { pgsqlPgConversionEntry 7 }
+
+pgsqlPgConversionCondefault			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is the default conversion"
+	::= { pgsqlPgConversionEntry 8 }
+
+
+---------------------------------------
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgDatabaseTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgDatabaseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_database stores information about the available databases. Databases are created with the CREATE DATABASE command. Unlike most system catalogs, pg_database is shared across all databases of a cluster: there is only one copy of pg_database per cluster, not one per database."
+	::= { pgsqlCatalogTables 14 }
+
+pgsqlPgDatabaseEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgDatabaseEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A database"
+	INDEX  { pgsnmpdConnID, pgsqlPgDatabaseEntryOID }
+	::= { pgsqlPgDatabaseTable 1 }
+
+PgsqlPgDatabaseEntry ::=
+	SEQUENCE {
+		pgsqlPgDatabaseEntryOID		INTEGER,
+		pgsqlPgDatabaseDatname		DisplayString,
+		pgsqlPgDatabaseDatdba		INTEGER,
+		pgsqlPgDatabaseEncoding		INTEGER,
+		pgsqlPgDatabaseDatistemplate		TruthValue,
+		pgsqlPgDatabaseDatallowconn		TruthValue,
+		pgsqlPgDatabaseDatconnlimit		INTEGER,
+		pgsqlPgDatabaseDatlastsysoid		INTEGER,
+		pgsqlPgDatabaseDatfrozenxid		INTEGER,
+		pgsqlPgDatabaseDattablespace		INTEGER,
+		pgsqlPgDatabaseDatconfig		DisplayString,
+		pgsqlPgDatabaseDatacl		DisplayString
+	}
+
+pgsqlPgDatabaseEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgDatabaseEntry 1 }
+
+pgsqlPgDatabaseDatname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Database name"
+	::= { pgsqlPgDatabaseEntry 2 }
+
+pgsqlPgDatabaseDatdba			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the database, usually the user who created it"
+	::= { pgsqlPgDatabaseEntry 3 }
+
+pgsqlPgDatabaseEncoding			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Character encoding for this database ( pg_encoding_to_char() can translate this number to the encoding name)"
+	::= { pgsqlPgDatabaseEntry 4 }
+
+pgsqlPgDatabaseDatistemplate			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true then this database can be used in the TEMPLATE clause of CREATE DATABASE to create a new database as a clone of this one"
+	::= { pgsqlPgDatabaseEntry 5 }
+
+pgsqlPgDatabaseDatallowconn			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If false then no one can connect to this database. This is used to protect the template0 database from being altered"
+	::= { pgsqlPgDatabaseEntry 6 }
+
+pgsqlPgDatabaseDatconnlimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sets maximum number of concurrent connections that can be made to this database. -1 means no limit"
+	::= { pgsqlPgDatabaseEntry 7 }
+
+pgsqlPgDatabaseDatlastsysoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Last system OID in the database; useful particularly to pg_dump"
+	::= { pgsqlPgDatabaseEntry 8 }
+
+pgsqlPgDatabaseDatfrozenxid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"All transaction IDs before this one have been replaced with a permanent ( "
+	::= { pgsqlPgDatabaseEntry 9 }
+
+pgsqlPgDatabaseDattablespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The default tablespace for the database. Within this database, all tables for which pg_class . reltablespace is zero will be stored in this tablespace; in particular, all the non-shared system catalogs will be there"
+	::= { pgsqlPgDatabaseEntry 10 }
+
+pgsqlPgDatabaseDatconfig			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Session defaults for run-time configuration variables"
+	::= { pgsqlPgDatabaseEntry 11 }
+
+pgsqlPgDatabaseDatacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgDatabaseEntry 12 }
+
+
+---------------------------------------
+pgsqlPgDependTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgDependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_depend records the dependency relationships between database objects. This information allows DROP commands to find which other objects must be dropped by DROP CASCADE or prevent dropping in the DROP RESTRICT case. See also pg_shdepend, which performs a similar function for dependencies involving objects that are shared across a database cluster."
+	::= { pgsqlCatalogTables 15 }
+
+pgsqlPgDependEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgDependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Dependancy entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgDependEntryOID }
+	::= { pgsqlPgDependTable 1 }
+
+PgsqlPgDependEntry ::=
+	SEQUENCE {
+		pgsqlPgDependEntryOID		INTEGER,
+		pgsqlPgDependClassid		INTEGER,
+		pgsqlPgDependObjid		INTEGER,
+		pgsqlPgDependObjsubid		INTEGER,
+		pgsqlPgDependRefclassid		INTEGER,
+		pgsqlPgDependRefobjid		INTEGER,
+		pgsqlPgDependRefobjsubid		INTEGER,
+		pgsqlPgDependDeptype		char
+	}
+
+pgsqlPgDependEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgDependEntry 1 }
+
+pgsqlPgDependClassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the dependent object is in"
+	::= { pgsqlPgDependEntry 2 }
+
+pgsqlPgDependObjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific dependent object"
+	::= { pgsqlPgDependEntry 3 }
+
+pgsqlPgDependObjsubid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a table column, this is the column number (the objid and classid refer to the table itself). For all other object types, this column is zero"
+	::= { pgsqlPgDependEntry 4 }
+
+pgsqlPgDependRefclassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the referenced object is in"
+	::= { pgsqlPgDependEntry 5 }
+
+pgsqlPgDependRefobjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific referenced object"
+	::= { pgsqlPgDependEntry 6 }
+
+pgsqlPgDependRefobjsubid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a table column, this is the column number (the refobjid and refclassid refer to the table itself). For all other object types, this column is zero"
+	::= { pgsqlPgDependEntry 7 }
+
+pgsqlPgDependDeptype			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code defining the specific semantics of this dependency relationship; see text"
+	::= { pgsqlPgDependEntry 8 }
+
+
+---------------------------------------
+pgsqlPgDescriptionTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgDescriptionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_description stores optional descriptions (comments) for each database object. Descriptions can be manipulated with the COMMENT command and viewed with psql's \d commands. Descriptions of many built-in system objects are provided in the initial contents of pg_description. See also pg_shdescription, which performs a similar function for descriptions involving objects that are shared across a database cluster."
+	::= { pgsqlCatalogTables 16 }
+
+pgsqlPgDescriptionEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgDescriptionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Description entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgDescriptionEntryOID }
+	::= { pgsqlPgDescriptionTable 1 }
+
+PgsqlPgDescriptionEntry ::=
+	SEQUENCE {
+		pgsqlPgDescriptionEntryOID		INTEGER,
+		pgsqlPgDescriptionObjoid		INTEGER,
+		pgsqlPgDescriptionClassoid		INTEGER,
+		pgsqlPgDescriptionObjsubid		INTEGER,
+		pgsqlPgDescriptionDescription		DisplayString
+	}
+
+pgsqlPgDescriptionEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgDescriptionEntry 1 }
+
+pgsqlPgDescriptionObjoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the object this description pertains to"
+	::= { pgsqlPgDescriptionEntry 2 }
+
+pgsqlPgDescriptionClassoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog this object appears in"
+	::= { pgsqlPgDescriptionEntry 3 }
+
+pgsqlPgDescriptionObjsubid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a comment on a table column, this is the column number (the objoid and classoid refer to the table itself). For all other object types, this column is zero"
+	::= { pgsqlPgDescriptionEntry 4 }
+
+pgsqlPgDescriptionDescription			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Arbitrary text that serves as the description of this object"
+	::= { pgsqlPgDescriptionEntry 5 }
+
+
+---------------------------------------
+pgsqlPgEnumTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgEnumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_enum catalog contains entries matching enum types to their associated values and labels. The internal representation of a given enum value is actually the OID of its associated row in pg_enum. The OIDs for a particular enum type are guaranteed to be ordered in the way the type should sort, but there is no guarantee about the ordering of OIDs of unrelated enum types."
+	::= { pgsqlCatalogTables 34 }
+
+pgsqlPgEnumEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgEnumEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_enum entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgEnumEntryOID }
+	::= { pgsqlPgEnumTable 1 }
+
+PgsqlPgEnumEntry ::=
+	SEQUENCE {
+		pgsqlPgEnumEntryOID		INTEGER,
+		pgsqlPgEnumEnumtypid		INTEGER,
+		pgsqlPgEnumEnumlabel		DisplayString
+	}
+
+pgsqlPgEnumEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgEnumEntry 1 }
+
+pgsqlPgEnumEnumtypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_type entry owning this enum value"
+	::= { pgsqlPgEnumEntry 2 }
+
+pgsqlPgEnumEnumlabel			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The textual label for this enum value"
+	::= { pgsqlPgEnumEntry 3 }
+
+
+---------------------------------------
+pgsqlPgIndexTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgIndexEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_index contains part of the information about indexes. The rest is mostly in pg_class."
+	::= { pgsqlCatalogTables 17 }
+
+pgsqlPgIndexEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgIndexEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single index"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgIndexEntryOID }
+	::= { pgsqlPgIndexTable 1 }
+
+PgsqlPgIndexEntry ::=
+	SEQUENCE {
+		pgsqlPgIndexEntryOID		INTEGER,
+		pgsqlPgIndexIndexrelid		INTEGER,
+		pgsqlPgIndexIndrelid		INTEGER,
+		pgsqlPgIndexIndnatts		INTEGER,
+		pgsqlPgIndexIndisunique		TruthValue,
+		pgsqlPgIndexIndisprimary		TruthValue,
+		pgsqlPgIndexIndisclustered		TruthValue,
+		pgsqlPgIndexIndisvalid		TruthValue,
+		pgsqlPgIndexIndkey		DisplayString,
+		pgsqlPgIndexIndclass		DisplayString,
+		pgsqlPgIndexIndexprs		DisplayString,
+		pgsqlPgIndexIndpred		DisplayString
+	}
+
+pgsqlPgIndexEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgIndexEntry 1 }
+
+pgsqlPgIndexIndexrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_class entry for this index"
+	::= { pgsqlPgIndexEntry 2 }
+
+pgsqlPgIndexIndrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_class entry for the table this index is for"
+	::= { pgsqlPgIndexEntry 3 }
+
+pgsqlPgIndexIndnatts			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of columns in the index (duplicates pg_class.relnatts )"
+	::= { pgsqlPgIndexEntry 4 }
+
+pgsqlPgIndexIndisunique			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, this is a unique index"
+	::= { pgsqlPgIndexEntry 5 }
+
+pgsqlPgIndexIndisprimary			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, this index represents the primary key of the table. ( indisunique should always be true when this is true.)"
+	::= { pgsqlPgIndexEntry 6 }
+
+pgsqlPgIndexIndisclustered			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, the table was last clustered on this index"
+	::= { pgsqlPgIndexEntry 7 }
+
+pgsqlPgIndexIndisvalid			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If true, the index is currently valid for queries. False means the index is possibly incomplete: it must still be modified by INSERT / UPDATE operations, but it cannot safely be used for queries. If it is unique, the uniqueness property is not true either"
+	::= { pgsqlPgIndexEntry 8 }
+
+pgsqlPgIndexIndkey			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is an array of indnatts values that indicate which table columns this index indexes. For example a value of 1 3 would mean that the first and the third table columns make up the index key. A zero in this array indicates that the corresponding index attribute is an expression over the table columns, rather than a simple column reference."
+	::= { pgsqlPgIndexEntry 9 }
+
+pgsqlPgIndexIndclass			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For each column in the index key this contains the OID of the operator class to use. See pg_opclass for details"
+	::= { pgsqlPgIndexEntry 10 }
+
+pgsqlPgIndexIndexprs			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression trees (in nodeToString() representation) for index attributes that are not simple column references. This is a list with one element for each zero entry in indkey . NULL if all index attributes are simple references"
+	::= { pgsqlPgIndexEntry 11 }
+
+pgsqlPgIndexIndpred			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression tree (in nodeToString() representation) for partial index predicate. NULL if not a partial index"
+	::= { pgsqlPgIndexEntry 12 }
+
+
+---------------------------------------
+pgsqlPgInheritsTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgInheritsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_inherits records information about table inheritance hierarchies. There is one entry for each direct child table in the database. (Indirect inheritance can be determined by following chains of entries.)"
+	::= { pgsqlCatalogTables 18 }
+
+pgsqlPgInheritsEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgInheritsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents an inheritance relationship"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgInheritsEntryOID }
+	::= { pgsqlPgInheritsTable 1 }
+
+PgsqlPgInheritsEntry ::=
+	SEQUENCE {
+		pgsqlPgInheritsEntryOID		INTEGER,
+		pgsqlPgInheritsInhrelid		INTEGER,
+		pgsqlPgInheritsInhparent		INTEGER,
+		pgsqlPgInheritsInhseqno		INTEGER
+	}
+
+pgsqlPgInheritsEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgInheritsEntry 1 }
+
+pgsqlPgInheritsInhrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the child table"
+	::= { pgsqlPgInheritsEntry 2 }
+
+pgsqlPgInheritsInhparent			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the parent table"
+	::= { pgsqlPgInheritsEntry 3 }
+
+pgsqlPgInheritsInhseqno			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in which the inherited columns are to be arranged. The count starts at 1"
+	::= { pgsqlPgInheritsEntry 4 }
+
+
+---------------------------------------
+pgsqlPgLanguageTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgLanguageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_language registers languages in which you can write functions or stored procedures."
+	::= { pgsqlCatalogTables 19 }
+
+pgsqlPgLanguageEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgLanguageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single language"
+	INDEX  { entryID, rdbmsDbIndex, pgsqlPgLanguageEntryOID }
+	::= { pgsqlPgLanguageTable 1 }
+
+PgsqlPgLanguageEntry ::=
+	SEQUENCE {
+		pgsqlPgLanguageEntryOID		INTEGER,
+		pgsqlPgLanguageLanname		DisplayString,
+		pgsqlPgLanguageLanispl		TruthValue,
+		pgsqlPgLanguageLanpltrusted		TruthValue,
+		pgsqlPgLanguageLanplcallfoid		INTEGER,
+		pgsqlPgLanguageLanvalidator		INTEGER,
+		pgsqlPgLanguageLanacl		DisplayString
+	}
+
+pgsqlPgLanguageEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgLanguageEntry 1 }
+
+pgsqlPgLanguageLanname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the language"
+	::= { pgsqlPgLanguageEntry 2 }
+
+pgsqlPgLanguageLanispl			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is false for internal languages (such as SQL ) and true for user-defined languages. Currently, pg_dump still uses this to determine which languages need to be dumped, but this may be replaced by a different mechanism in the future"
+	::= { pgsqlPgLanguageEntry 3 }
+
+pgsqlPgLanguageLanpltrusted			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is a trusted language, which means that it is believed not to grant access to anything outside the normal SQL execution environment. Only superusers may create functions in untrusted languages"
+	::= { pgsqlPgLanguageEntry 4 }
+
+pgsqlPgLanguageLanplcallfoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For noninternal languages this references the language handler, which is a special function that is responsible for executing all functions that are written in the particular language"
+	::= { pgsqlPgLanguageEntry 5 }
+
+pgsqlPgLanguageLanvalidator			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This references a language validator function that is responsible for checking the syntax and validity of new functions when they are created. Zero if no validator is provided"
+	::= { pgsqlPgLanguageEntry 6 }
+
+pgsqlPgLanguageLanacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgLanguageEntry 7 }
+
+
+---------------------------------------
+-- The 'data' column from pg_largeobject is not included here, because SNMP would only allow 255 or so bytes to be returned anyway, and that seems fairly useless
+pgsqlPgLargeobjectTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgLargeobjectEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_largeobject holds the data making up 'large objects'. A large object is identified by an OID assigned when it is created. Each large object is broken into segments or 'pages' small enough to be conveniently stored as rows in pg_largeobject. The amount of data per page is defined to be LOBLKSIZE (which is currently BLCKSZ/4, or typically 2 kB)."
+	::= { pgsqlCatalogTables 20 }
+
+pgsqlPgLargeobjectEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgLargeobjectEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a page from a large object"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgLargeobjectEntryOID }
+	::= { pgsqlPgLargeobjectTable 1 }
+
+PgsqlPgLargeobjectEntry ::=
+	SEQUENCE {
+		pgsqlPgLargeobjectEntryOID		INTEGER,
+		pgsqlPgLargeobjectLoid		INTEGER,
+		pgsqlPgLargeobjectPageno		INTEGER
+	}
+
+pgsqlPgLargeobjectEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgLargeobjectEntry 1 }
+
+pgsqlPgLargeobjectLoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Identifier of the large object that includes this page"
+	::= { pgsqlPgLargeobjectEntry 2 }
+
+pgsqlPgLargeobjectPageno			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Page number of this page within its large object (counting from zero)"
+	::= { pgsqlPgLargeobjectEntry 3 }
+
+
+---------------------------------------
+pgsqlPgListenerTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgListenerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_listener supports the LISTEN and NOTIFY commands. A listener creates an entry in pg_listener for each notification name it is listening for. A notifier scans pg_listener and updates each matching entry to show that a notification has occurred. The notifier also sends a signal (using the PID recorded in the table) to awaken the listener from sleep."
+	::= { pgsqlCatalogTables 21 }
+
+pgsqlPgListenerEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgListenerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single listener"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgListenerEntryOID }
+	::= { pgsqlPgListenerTable 1 }
+
+PgsqlPgListenerEntry ::=
+	SEQUENCE {
+		pgsqlPgListenerEntryOID		INTEGER,
+		pgsqlPgListenerRelname		DisplayString,
+		pgsqlPgListenerListenerpid		INTEGER,
+		pgsqlPgListenerNotification		INTEGER
+	}
+
+pgsqlPgListenerEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgListenerEntry 1 }
+
+pgsqlPgListenerRelname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Notify condition name. (The name need not match any actual relation in the database; the name relname is historical.)"
+	::= { pgsqlPgListenerEntry 2 }
+
+pgsqlPgListenerListenerpid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"PID of the server process that created this entry"
+	::= { pgsqlPgListenerEntry 3 }
+
+pgsqlPgListenerNotification			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Zero if no event is pending for this listener. If an event is pending, the PID of the server process that sent the notification."
+	::= { pgsqlPgListenerEntry 4 }
+
+
+---------------------------------------
+pgsqlPgNamespaceTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgNamespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_namespace stores namespaces. A namespace is the structure underlying SQL schemas: each namespace can have a separate collection of relations, types, etc. without name conflicts."
+	::= { pgsqlCatalogTables 22 }
+
+pgsqlPgNamespaceEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgNamespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single namespace"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgNamespaceEntryOID }
+	::= { pgsqlPgNamespaceTable 1 }
+
+PgsqlPgNamespaceEntry ::=
+	SEQUENCE {
+		pgsqlPgNamespaceEntryOID		INTEGER,
+		pgsqlPgNamespaceNspname		DisplayString,
+		pgsqlPgNamespaceNspowner		INTEGER,
+		pgsqlPgNamespaceNspacl		DisplayString
+	}
+
+pgsqlPgNamespaceEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgNamespaceEntry 1 }
+
+pgsqlPgNamespaceNspname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the namespace"
+	::= { pgsqlPgNamespaceEntry 2 }
+
+pgsqlPgNamespaceNspowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the namespace"
+	::= { pgsqlPgNamespaceEntry 3 }
+
+pgsqlPgNamespaceNspacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgNamespaceEntry 4 }
+
+
+---------------------------------------
+pgsqlPgOpclassTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOpclassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_opclass defines index access method operator classes. Each operator class defines semantics for index columns of a particular data type and a particular index access method. Note that there can be multiple operator classes for a given data type/access method combination, thus supporting multiple behaviors."
+	::= { pgsqlCatalogTables 23 }
+
+pgsqlPgOpclassEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOpclassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents an index access method operator class"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOpclassEntryOID }
+	::= { pgsqlPgOpclassTable 1 }
+
+PgsqlPgOpclassEntry ::=
+	SEQUENCE {
+		pgsqlPgOpclassEntryOID		INTEGER,
+		pgsqlPgOpclassOpcamid		INTEGER,
+		pgsqlPgOpclassOpcname		DisplayString,
+		pgsqlPgOpclassOpcnamespace		INTEGER,
+		pgsqlPgOpclassOpcowner		INTEGER,
+		pgsqlPgOpclassOpcintype		INTEGER,
+		pgsqlPgOpclassOpcdefault		TruthValue,
+		pgsqlPgOpclassOpckeytype		INTEGER
+	}
+
+pgsqlPgOpclassEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOpclassEntry 1 }
+
+pgsqlPgOpclassOpcamid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator class is for"
+	::= { pgsqlPgOpclassEntry 2 }
+
+pgsqlPgOpclassOpcname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of this operator class"
+	::= { pgsqlPgOpclassEntry 3 }
+
+pgsqlPgOpclassOpcnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Namespace of this operator class"
+	::= { pgsqlPgOpclassEntry 4 }
+
+pgsqlPgOpclassOpcowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator class"
+	::= { pgsqlPgOpclassEntry 5 }
+
+pgsqlPgOpclassOpcintype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type that the operator class indexes"
+	::= { pgsqlPgOpclassEntry 6 }
+
+pgsqlPgOpclassOpcdefault			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this operator class is the default for opcintype"
+	::= { pgsqlPgOpclassEntry 7 }
+
+pgsqlPgOpclassOpckeytype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of data stored in index, or zero if same as opcintype"
+	::= { pgsqlPgOpclassEntry 8 }
+
+
+---------------------------------------
+pgsqlPgOperatorTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOperatorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_operator stores information about operators."
+	::= { pgsqlCatalogTables 24 }
+
+pgsqlPgOperatorEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOperatorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single operator"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOperatorEntryOID }
+	::= { pgsqlPgOperatorTable 1 }
+
+PgsqlPgOperatorEntry ::=
+	SEQUENCE {
+		pgsqlPgOperatorEntryOID		INTEGER,
+		pgsqlPgOperatorOprname		DisplayString,
+		pgsqlPgOperatorOprnamespace		INTEGER,
+		pgsqlPgOperatorOprowner		INTEGER,
+		pgsqlPgOperatorOprkind		DisplayString,
+		pgsqlPgOperatorOprcanhash		TruthValue,
+		pgsqlPgOperatorOprleft		INTEGER,
+		pgsqlPgOperatorOprright		INTEGER,
+		pgsqlPgOperatorOprresult		INTEGER,
+		pgsqlPgOperatorOprcom		INTEGER,
+		pgsqlPgOperatorOprnegate		INTEGER,
+		pgsqlPgOperatorOprlsortop		INTEGER,
+		pgsqlPgOperatorOprrsortop		INTEGER,
+		pgsqlPgOperatorOprltcmpop		INTEGER,
+		pgsqlPgOperatorOprgtcmpop		INTEGER,
+		pgsqlPgOperatorOprcode		INTEGER,
+		pgsqlPgOperatorOprrest		INTEGER,
+		pgsqlPgOperatorOprjoin		INTEGER
+	}
+
+pgsqlPgOperatorEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOperatorEntry 1 }
+
+pgsqlPgOperatorOprname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the operator"
+	::= { pgsqlPgOperatorEntry 2 }
+
+pgsqlPgOperatorOprnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this operator"
+	::= { pgsqlPgOperatorEntry 3 }
+
+pgsqlPgOperatorOprowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator"
+	::= { pgsqlPgOperatorEntry 4 }
+
+pgsqlPgOperatorOprkind			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"b = infix ( "
+	::= { pgsqlPgOperatorEntry 5 }
+
+pgsqlPgOperatorOprcanhash			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This operator supports hash joins"
+	::= { pgsqlPgOperatorEntry 6 }
+
+pgsqlPgOperatorOprleft			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the left operand"
+	::= { pgsqlPgOperatorEntry 7 }
+
+pgsqlPgOperatorOprright			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the right operand"
+	::= { pgsqlPgOperatorEntry 8 }
+
+pgsqlPgOperatorOprresult			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of the result"
+	::= { pgsqlPgOperatorEntry 9 }
+
+pgsqlPgOperatorOprcom			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Commutator of this operator, if any"
+	::= { pgsqlPgOperatorEntry 10 }
+
+pgsqlPgOperatorOprnegate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Negator of this operator, if any"
+	::= { pgsqlPgOperatorEntry 11 }
+
+pgsqlPgOperatorOprlsortop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the operator that sorts the type of the left-hand operand ( L<L )"
+	::= { pgsqlPgOperatorEntry 12 }
+
+pgsqlPgOperatorOprrsortop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the operator that sorts the type of the right-hand operand ( R<R )"
+	::= { pgsqlPgOperatorEntry 13 }
+
+pgsqlPgOperatorOprltcmpop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the less-than operator that compares the left and right operand types ( L<R )"
+	::= { pgsqlPgOperatorEntry 14 }
+
+pgsqlPgOperatorOprgtcmpop			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this operator supports merge joins, the greater-than operator that compares the left and right operand types ( L>R )"
+	::= { pgsqlPgOperatorEntry 15 }
+
+pgsqlPgOperatorOprcode			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function that implements this operator"
+	::= { pgsqlPgOperatorEntry 16 }
+
+pgsqlPgOperatorOprrest			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Restriction selectivity estimation function for this operator"
+	::= { pgsqlPgOperatorEntry 17 }
+
+pgsqlPgOperatorOprjoin			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Join selectivity estimation function for this operator"
+	::= { pgsqlPgOperatorEntry 18 }
+
+
+---------------------------------------
+pgsqlPgOpfamilyTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOpfamilyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_opfamily defines operator families. Each operator family is a collection of operators and associated support routines that implement the semantics specified for a particular index access method. Furthermore, the operators in a family are all 'compatible', in a way that is specified by the access method. The operator family concept allows cross-data-type operators to be used with indexes and to be reasoned about using knowledge of access method semantics."
+	::= { pgsqlCatalogTables 35 }
+
+pgsqlPgOpfamilyEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOpfamilyEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_opfamily entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOpfamilyEntryOID }
+	::= { pgsqlPgOpfamilyTable 1 }
+
+PgsqlPgOpfamilyEntry ::=
+	SEQUENCE {
+		pgsqlPgOpfamilyEntryOID		INTEGER,
+		pgsqlPgOpfamilyOpfmethod		INTEGER,
+		pgsqlPgOpfamilyOpfname		DisplayString,
+		pgsqlPgOpfamilyOpfnamespace		INTEGER,
+		pgsqlPgOpfamilyOpfowner		INTEGER
+	}
+
+pgsqlPgOpfamilyEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOpfamilyEntry 1 }
+
+pgsqlPgOpfamilyOpfmethod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator family is for"
+	::= { pgsqlPgOpfamilyEntry 2 }
+
+pgsqlPgOpfamilyOpfname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of this operator family"
+	::= { pgsqlPgOpfamilyEntry 3 }
+
+pgsqlPgOpfamilyOpfnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Namespace of this operator family"
+	::= { pgsqlPgOpfamilyEntry 4 }
+
+pgsqlPgOpfamilyOpfowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator family"
+	::= { pgsqlPgOpfamilyEntry 5 }
+
+
+---------------------------------------
+pgsqlPgPltemplateTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgPltemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_pltemplate stores 'template' information for procedural languages. A template for a language allows the language to be created in a particular database by a simple CREATE LANGUAGE command, with no need to specify implementation details. Unlike most system catalogs, pg_pltemplate is shared across all databases of a cluster: there is only one copy of pg_pltemplate per cluster, not one per database. This allows the information to be accessible in each database as it is needed."
+	::= { pgsqlCatalogTables 25 }
+
+pgsqlPgPltemplateEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgPltemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a procedural language template"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgPltemplateEntryOID }
+	::= { pgsqlPgPltemplateTable 1 }
+
+PgsqlPgPltemplateEntry ::=
+	SEQUENCE {
+		pgsqlPgPltemplateEntryOID		INTEGER,
+		pgsqlPgPltemplateTmplname		DisplayString,
+		pgsqlPgPltemplateTmpltrusted		TruthValue,
+		pgsqlPgPltemplateTmplhandler		DisplayString,
+		pgsqlPgPltemplateTmplvalidator		DisplayString,
+		pgsqlPgPltemplateTmpllibrary		DisplayString,
+		pgsqlPgPltemplateTmplacl		DisplayString
+	}
+
+pgsqlPgPltemplateEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgPltemplateEntry 1 }
+
+pgsqlPgPltemplateTmplname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the language this template is for"
+	::= { pgsqlPgPltemplateEntry 2 }
+
+pgsqlPgPltemplateTmpltrusted			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if language is considered trusted"
+	::= { pgsqlPgPltemplateEntry 3 }
+
+pgsqlPgPltemplateTmplhandler			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of call handler function"
+	::= { pgsqlPgPltemplateEntry 4 }
+
+pgsqlPgPltemplateTmplvalidator			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of validator function, or NULL if none"
+	::= { pgsqlPgPltemplateEntry 5 }
+
+pgsqlPgPltemplateTmpllibrary			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Path of shared library that implements language"
+	::= { pgsqlPgPltemplateEntry 6 }
+
+pgsqlPgPltemplateTmplacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges for template (not yet used)"
+	::= { pgsqlPgPltemplateEntry 7 }
+
+
+---------------------------------------
+pgsqlPgProcTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_proc stores information about functions (or procedures). The table contains data for aggregate functions as well as plain functions. If proisagg is true, there should be a matching row in pg_aggregate."
+	::= { pgsqlCatalogTables 26 }
+
+pgsqlPgProcEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgProcEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single stored procedure"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgProcEntryOID }
+	::= { pgsqlPgProcTable 1 }
+
+PgsqlPgProcEntry ::=
+	SEQUENCE {
+		pgsqlPgProcEntryOID		INTEGER,
+		pgsqlPgProcProname		DisplayString,
+		pgsqlPgProcPronamespace		INTEGER,
+		pgsqlPgProcProowner		INTEGER,
+		pgsqlPgProcProlang		INTEGER,
+		pgsqlPgProcProisagg		TruthValue,
+		pgsqlPgProcProsecdef		TruthValue,
+		pgsqlPgProcProisstrict		TruthValue,
+		pgsqlPgProcProretset		TruthValue,
+		pgsqlPgProcProvolatile		DisplayString,
+		pgsqlPgProcPronargs		INTEGER,
+		pgsqlPgProcProrettype		INTEGER,
+		pgsqlPgProcProargtypes		DisplayString,
+		pgsqlPgProcProallargtypes		DisplayString,
+		pgsqlPgProcProargmodes		DisplayString,
+		pgsqlPgProcProargnames		DisplayString,
+		pgsqlPgProcProsrc		DisplayString,
+		pgsqlPgProcProbin		DisplayString,
+		pgsqlPgProcProacl		DisplayString
+	}
+
+pgsqlPgProcEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgProcEntry 1 }
+
+pgsqlPgProcProname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the function"
+	::= { pgsqlPgProcEntry 2 }
+
+pgsqlPgProcPronamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this function"
+	::= { pgsqlPgProcEntry 3 }
+
+pgsqlPgProcProowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the function"
+	::= { pgsqlPgProcEntry 4 }
+
+pgsqlPgProcProlang			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Implementation language or call interface of this function"
+	::= { pgsqlPgProcEntry 5 }
+
+pgsqlPgProcProisagg			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function is an aggregate function"
+	::= { pgsqlPgProcEntry 6 }
+
+pgsqlPgProcProsecdef			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function is a security definer (i.e., a "
+	::= { pgsqlPgProcEntry 7 }
+
+pgsqlPgProcProisstrict			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function returns null if any call argument is null. In that case the function won't actually be called at all. Functions that are not "
+	::= { pgsqlPgProcEntry 8 }
+
+pgsqlPgProcProretset			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Function returns a set (i.e., multiple values of the specified data type)"
+	::= { pgsqlPgProcEntry 9 }
+
+pgsqlPgProcProvolatile			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"provolatile tells whether the function's result depends only on its input arguments, or is affected by outside factors. It is i for "
+	::= { pgsqlPgProcEntry 10 }
+
+pgsqlPgProcPronargs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of arguments"
+	::= { pgsqlPgProcEntry 11 }
+
+pgsqlPgProcProrettype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type of the return value"
+	::= { pgsqlPgProcEntry 12 }
+
+pgsqlPgProcProargtypes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the data types of the function arguments. This includes only input arguments (including INOUT arguments), and thus represents the call signature of the function"
+	::= { pgsqlPgProcEntry 13 }
+
+pgsqlPgProcProallargtypes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the data types of the function arguments. This includes all arguments (including OUT and INOUT arguments); however, if all the arguments are IN arguments, this field will be null. Note that subscripting is 1-based, whereas for historical reasons proargtypes is subscripted from 0"
+	::= { pgsqlPgProcEntry 14 }
+
+pgsqlPgProcProargmodes			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the modes of the function arguments, encoded as i for IN arguments, o for OUT arguments, b for INOUT arguments. If all the arguments are IN arguments, this field will be null. Note that subscripts correspond to positions of proallargtypes not proargtypes"
+	::= { pgsqlPgProcEntry 15 }
+
+pgsqlPgProcProargnames			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An array with the names of the function arguments. Arguments without a name are set to empty strings in the array. If none of the arguments have a name, this field will be null. Note that subscripts correspond to positions of proallargtypes not proargtypes"
+	::= { pgsqlPgProcEntry 16 }
+
+pgsqlPgProcProsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This tells the function handler how to invoke the function. It might be the actual source code of the function for interpreted languages, a link symbol, a file name, or just about anything else, depending on the implementation language/call convention"
+	::= { pgsqlPgProcEntry 17 }
+
+pgsqlPgProcProbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Additional information about how to invoke the function. Again, the interpretation is language-specific"
+	::= { pgsqlPgProcEntry 18 }
+
+pgsqlPgProcProacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgProcEntry 19 }
+
+
+---------------------------------------
+pgsqlPgRewriteTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgRewriteEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_rewrite stores rewrite rules for tables and views."
+	::= { pgsqlCatalogTables 27 }
+
+pgsqlPgRewriteEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgRewriteEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single rewrite rule"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgRewriteEntryOID }
+	::= { pgsqlPgRewriteTable 1 }
+
+PgsqlPgRewriteEntry ::=
+	SEQUENCE {
+		pgsqlPgRewriteEntryOID		INTEGER,
+		pgsqlPgRewriteRulename		DisplayString,
+		pgsqlPgRewriteEvClass		INTEGER,
+		pgsqlPgRewriteEvAttr		INTEGER,
+		pgsqlPgRewriteEvType		DisplayString,
+		pgsqlPgRewriteIsInstead		TruthValue,
+		pgsqlPgRewriteEvQual		DisplayString,
+		pgsqlPgRewriteEvAction		DisplayString
+	}
+
+pgsqlPgRewriteEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgRewriteEntry 1 }
+
+pgsqlPgRewriteRulename			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Rule name"
+	::= { pgsqlPgRewriteEntry 2 }
+
+pgsqlPgRewriteEvClass			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this rule is for"
+	::= { pgsqlPgRewriteEntry 3 }
+
+pgsqlPgRewriteEvAttr			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The column this rule is for (currently, always zero to indicate the whole table)"
+	::= { pgsqlPgRewriteEntry 4 }
+
+pgsqlPgRewriteEvType			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Event type that the rule is for: 1 = SELECT , 2 = UPDATE , 3 = INSERT , 4 = DELETE"
+	::= { pgsqlPgRewriteEntry 5 }
+
+pgsqlPgRewriteIsInstead			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the rule is an INSTEAD rule"
+	::= { pgsqlPgRewriteEntry 6 }
+
+pgsqlPgRewriteEvQual			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expression tree (in the form of a nodeToString() representation) for the rule's qualifying condition"
+	::= { pgsqlPgRewriteEntry 7 }
+
+pgsqlPgRewriteEvAction			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Query tree (in the form of a nodeToString() representation) for the rule's action"
+	::= { pgsqlPgRewriteEntry 8 }
+
+
+---------------------------------------
+pgsqlPgShdependTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgShdependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_shdepend records the dependency relationships between database objects and shared objects, such as roles. This information allows PostgreSQL to ensure that those objects are unreferenced before attempting to delete them. See also pg_depend, which performs a similar function for dependencies involving objects within a single database. Unlike most system catalogs, pg_shdepend is shared across all databases of a cluster: there is only one copy of pg_shdepend per cluster, not one per database."
+	::= { pgsqlCatalogTables 28 }
+
+pgsqlPgShdependEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgShdependEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single shared-object dependency"
+	INDEX  { pgsnmpdConnID, pgsqlPgShdependEntryOID }
+	::= { pgsqlPgShdependTable 1 }
+
+PgsqlPgShdependEntry ::=
+	SEQUENCE {
+		pgsqlPgShdependEntryOID		INTEGER,
+		pgsqlPgShdependDbid		INTEGER,
+		pgsqlPgShdependClassid		INTEGER,
+		pgsqlPgShdependObjid		INTEGER,
+		pgsqlPgShdependRefclassid		INTEGER,
+		pgsqlPgShdependRefobjid		INTEGER,
+		pgsqlPgShdependDeptype		DisplayString
+	}
+
+pgsqlPgShdependEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgShdependEntry 1 }
+
+pgsqlPgShdependDbid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the database the dependent object is in, or zero for a shared object"
+	::= { pgsqlPgShdependEntry 2 }
+
+pgsqlPgShdependClassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the dependent object is in"
+	::= { pgsqlPgShdependEntry 3 }
+
+pgsqlPgShdependObjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific dependent object"
+	::= { pgsqlPgShdependEntry 4 }
+
+pgsqlPgShdependRefclassid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog the referenced object is in (must be a shared catalog)"
+	::= { pgsqlPgShdependEntry 5 }
+
+pgsqlPgShdependRefobjid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the specific referenced object"
+	::= { pgsqlPgShdependEntry 6 }
+
+pgsqlPgShdependDeptype			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code defining the specific semantics of this dependency relationship; see text"
+	::= { pgsqlPgShdependEntry 7 }
+
+
+---------------------------------------
+pgsqlPgShdescriptionTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgShdescriptionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_shdescription stores optional descriptions (comments) for shared database objects. Descriptions can be manipulated with the COMMENT command and viewed with psql's \d commands. See also pg_description, which performs a similar function for descriptions involving objects within a single database. Unlike most system catalogs, pg_shdescription is shared across all databases of a cluster: there is only one copy of pg_shdescription per cluster, not one per database."
+	::= { pgsqlCatalogTables 29 }
+
+pgsqlPgShdescriptionEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgShdescriptionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single shared object description"
+	INDEX  { pgsnmpdConnID, pgsqlPgShdescriptionEntryOID }
+	::= { pgsqlPgShdescriptionTable 1 }
+
+PgsqlPgShdescriptionEntry ::=
+	SEQUENCE {
+		pgsqlPgShdescriptionEntryOID		INTEGER,
+		pgsqlPgShdescriptionObjoid		INTEGER,
+		pgsqlPgShdescriptionClassoid		INTEGER,
+		pgsqlPgShdescriptionDescription		DisplayString
+	}
+
+pgsqlPgShdescriptionEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgShdescriptionEntry 1 }
+
+pgsqlPgShdescriptionObjoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the object this description pertains to"
+	::= { pgsqlPgShdescriptionEntry 2 }
+
+pgsqlPgShdescriptionClassoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the system catalog this object appears in"
+	::= { pgsqlPgShdescriptionEntry 3 }
+
+pgsqlPgShdescriptionDescription			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Arbitrary text that serves as the description of this object"
+	::= { pgsqlPgShdescriptionEntry 4 }
+
+
+---------------------------------------
+pgsqlPgStatisticTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgStatisticEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_statistic stores statistical data about the contents of the database. Entries are created by ANALYZE and subsequently used by the query planner. There is one entry for each table column that has been analyzed. Note that all the statistical data is inherently approximate, even assuming that it is up-to-date. pg_statistic also stores statistical data about the values of index expressions. These are described as if they were actual data columns; in particular, starelid references the index. No entry is made for an ordinary non-expression index column, however, since it would be redundant with the entry for the underlying table column. Since different kinds of statistics may be appropriate for different kinds of data, pg_statistic is designed not to assume very much about what sort of statistics it stores. Only extremely general statistics (such as nullness) are given dedicated columns in pg_statistic. Everything else is stored in 'slots', which are groups of associated columns whose content is identified by a code number in one of the slot's columns. For more information see src/include/catalog/pg_statistic.h. pg_statistic should not be readable by the public, since even statistical information about a table's contents may be considered sensitive. (Example: minimum and maximum values of a salary column might be quite interesting.) pg_stats is a publicly readable view on pg_statistic that only exposes information about those tables that are readable by the current user."
+	::= { pgsqlCatalogTables 30 }
+
+pgsqlPgStatisticEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgStatisticEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents statistics data for a single column"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgStatisticEntryOID }
+	::= { pgsqlPgStatisticTable 1 }
+
+PgsqlPgStatisticEntry ::=
+	SEQUENCE {
+		pgsqlPgStatisticEntryOID		INTEGER,
+		pgsqlPgStatisticStarelid		INTEGER,
+		pgsqlPgStatisticStaattnum		INTEGER,
+		pgsqlPgStatisticStanullfrac		Float,
+		pgsqlPgStatisticStawidth		INTEGER,
+		pgsqlPgStatisticStadistinct		Float,
+		pgsqlPgStatisticStakind1		INTEGER,
+		pgsqlPgStatisticStakind2		INTEGER,
+		pgsqlPgStatisticStakind3		INTEGER,
+		pgsqlPgStatisticStakind4		INTEGER,
+		pgsqlPgStatisticStaop1		INTEGER,
+		pgsqlPgStatisticStaop2		INTEGER,
+		pgsqlPgStatisticStaop3		INTEGER,
+		pgsqlPgStatisticStaop4		INTEGER,
+		pgsqlPgStatisticStanumbers1		DisplayString,
+		pgsqlPgStatisticStanumbers2		DisplayString,
+		pgsqlPgStatisticStanumbers3		DisplayString,
+		pgsqlPgStatisticStanumbers4		DisplayString,
+		pgsqlPgStatisticStavalues1		DisplayString,
+		pgsqlPgStatisticStavalues2		DisplayString,
+		pgsqlPgStatisticStavalues3		DisplayString,
+		pgsqlPgStatisticStavalues4		DisplayString
+	}
+
+pgsqlPgStatisticEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgStatisticEntry 1 }
+
+pgsqlPgStatisticStarelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table or index that the described column belongs to"
+	::= { pgsqlPgStatisticEntry 2 }
+
+pgsqlPgStatisticStaattnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the described column"
+	::= { pgsqlPgStatisticEntry 3 }
+
+pgsqlPgStatisticStanullfrac			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The fraction of the column's entries that are null"
+	::= { pgsqlPgStatisticEntry 4 }
+
+pgsqlPgStatisticStawidth			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The average stored width, in bytes, of nonnull entries"
+	::= { pgsqlPgStatisticEntry 5 }
+
+pgsqlPgStatisticStadistinct			OBJECT-TYPE
+	SYNTAX		Float
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of distinct nonnull data values in the column. A value greater than zero is the actual number of distinct values. A value less than zero is the negative of a fraction of the number of rows in the table (for example, a column in which values appear about twice on the average could be represented by stadistinct = -0.5). A zero value means the number of distinct values is unknown"
+	::= { pgsqlPgStatisticEntry 6 }
+
+pgsqlPgStatisticStakind1			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 1st 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 7 }
+
+pgsqlPgStatisticStakind2			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 2nd 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 8 }
+
+pgsqlPgStatisticStakind3			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 3rd 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 9 }
+
+pgsqlPgStatisticStakind4			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A code number indicating the kind of statistics stored in the 4th 'slot' of the pg_statistic row"
+	::= { pgsqlPgStatisticEntry 10 }
+
+pgsqlPgStatisticStaop1			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 1st 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 11 }
+
+pgsqlPgStatisticStaop2			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 2nd 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 12 }
+
+pgsqlPgStatisticStaop3			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 3rd 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 13 }
+
+pgsqlPgStatisticStaop4			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"An operator used to derive the statistics stored in the 4th 'slot' . For example, a histogram slot would show the < operator that defines the sort order of the data"
+	::= { pgsqlPgStatisticEntry 14 }
+
+pgsqlPgStatisticStanumbers1			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 1st 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 15 }
+
+pgsqlPgStatisticStanumbers2			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 2nd 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 16 }
+
+pgsqlPgStatisticStanumbers3			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 3rd 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 17 }
+
+pgsqlPgStatisticStanumbers4			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numerical statistics of the appropriate kind for the 4th 'slot' , or NULL if the slot kind does not involve numerical values"
+	::= { pgsqlPgStatisticEntry 18 }
+
+pgsqlPgStatisticStavalues1			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 1st 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 19 }
+
+pgsqlPgStatisticStavalues2			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 2nd 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 20 }
+
+pgsqlPgStatisticStavalues3			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 3rd 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 21 }
+
+pgsqlPgStatisticStavalues4			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Column data values of the appropriate kind for the 4th 'slot' , or NULL if the slot kind does not store any data values. Each array's element values are actually of the specific column's data type, so there is no way to define these columns' type more specifically than anyarray"
+	::= { pgsqlPgStatisticEntry 22 }
+
+
+---------------------------------------
+pgsqlPgTablespaceTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTablespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_tablespace stores information about the available tablespaces. Tables can be placed in particular tablespaces to aid administration of disk layout. Unlike most system catalogs, pg_tablespace is shared across all databases of a cluster: there is only one copy of pg_tablespace per cluster, not one per database."
+	::= { pgsqlCatalogTables 31 }
+
+pgsqlPgTablespaceEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTablespaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single tablespace"
+	INDEX  { pgsnmpdConnID, pgsqlPgTablespaceEntryOID }
+	::= { pgsqlPgTablespaceTable 1 }
+
+PgsqlPgTablespaceEntry ::=
+	SEQUENCE {
+		pgsqlPgTablespaceEntryOID		INTEGER,
+		pgsqlPgTablespaceSpcname		DisplayString,
+		pgsqlPgTablespaceSpcowner		INTEGER,
+		pgsqlPgTablespaceSpclocation		DisplayString,
+		pgsqlPgTablespaceSpcacl		DisplayString
+	}
+
+pgsqlPgTablespaceEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTablespaceEntry 1 }
+
+pgsqlPgTablespaceSpcname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Tablespace name"
+	::= { pgsqlPgTablespaceEntry 2 }
+
+pgsqlPgTablespaceSpcowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the tablespace, usually the user who created it"
+	::= { pgsqlPgTablespaceEntry 3 }
+
+pgsqlPgTablespaceSpclocation			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Location (directory path) of the tablespace"
+	::= { pgsqlPgTablespaceEntry 4 }
+
+pgsqlPgTablespaceSpcacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgTablespaceEntry 5 }
+
+
+---------------------------------------
+pgsqlPgTriggerTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTriggerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_trigger stores triggers on tables."
+	::= { pgsqlCatalogTables 32 }
+
+pgsqlPgTriggerEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTriggerEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single trigger"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTriggerEntryOID }
+	::= { pgsqlPgTriggerTable 1 }
+
+PgsqlPgTriggerEntry ::=
+	SEQUENCE {
+		pgsqlPgTriggerEntryOID		INTEGER,
+		pgsqlPgTriggerTgrelid		INTEGER,
+		pgsqlPgTriggerTgname		DisplayString,
+		pgsqlPgTriggerTgfoid		INTEGER,
+		pgsqlPgTriggerTgtype		INTEGER,
+		pgsqlPgTriggerTgenabled		TruthValue,
+		pgsqlPgTriggerTgisconstraint		TruthValue,
+		pgsqlPgTriggerTgconstrname		DisplayString,
+		pgsqlPgTriggerTgconstrrelid		INTEGER,
+		pgsqlPgTriggerTgdeferrable		TruthValue,
+		pgsqlPgTriggerTginitdeferred		TruthValue,
+		pgsqlPgTriggerTgnargs		INTEGER,
+		pgsqlPgTriggerTgattr		DisplayString,
+		pgsqlPgTriggerTgargs		DisplayString
+	}
+
+pgsqlPgTriggerEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTriggerEntry 1 }
+
+pgsqlPgTriggerTgrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this trigger is on"
+	::= { pgsqlPgTriggerEntry 2 }
+
+pgsqlPgTriggerTgname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Trigger name (must be unique among triggers of same table)"
+	::= { pgsqlPgTriggerEntry 3 }
+
+pgsqlPgTriggerTgfoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The function to be called"
+	::= { pgsqlPgTriggerEntry 4 }
+
+pgsqlPgTriggerTgtype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Bit mask identifying trigger conditions"
+	::= { pgsqlPgTriggerEntry 5 }
+
+pgsqlPgTriggerTgenabled			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if trigger is enabled"
+	::= { pgsqlPgTriggerEntry 6 }
+
+pgsqlPgTriggerTgisconstraint			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if trigger implements a referential integrity constraint"
+	::= { pgsqlPgTriggerEntry 7 }
+
+pgsqlPgTriggerTgconstrname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Referential integrity constraint name"
+	::= { pgsqlPgTriggerEntry 8 }
+
+pgsqlPgTriggerTgconstrrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table referenced by an referential integrity constraint"
+	::= { pgsqlPgTriggerEntry 9 }
+
+pgsqlPgTriggerTgdeferrable			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if deferrable"
+	::= { pgsqlPgTriggerEntry 10 }
+
+pgsqlPgTriggerTginitdeferred			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if initially deferred"
+	::= { pgsqlPgTriggerEntry 11 }
+
+pgsqlPgTriggerTgnargs			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of argument strings passed to trigger function"
+	::= { pgsqlPgTriggerEntry 12 }
+
+pgsqlPgTriggerTgattr			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Currently unused"
+	::= { pgsqlPgTriggerEntry 13 }
+
+pgsqlPgTriggerTgargs			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Argument strings to pass to trigger, each NULL-terminated"
+	::= { pgsqlPgTriggerEntry 14 }
+
+
+---------------------------------------
+pgsqlPgTsConfigTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_config catalog contains entries representing text search configurations. A configuration specifies a particular text search parser and a list of dictionaries to use for each of the parser's output token types. The parser is shown in the pg_ts_config entry, but the token-to-dictionary mapping is defined by subsidiary entries in pg_ts_config_map."
+	::= { pgsqlCatalogTables 36 }
+
+pgsqlPgTsConfigEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsConfigEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_config entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsConfigEntryOID }
+	::= { pgsqlPgTsConfigTable 1 }
+
+PgsqlPgTsConfigEntry ::=
+	SEQUENCE {
+		pgsqlPgTsConfigEntryOID		INTEGER,
+		pgsqlPgTsConfigCfgname		DisplayString ,
+		pgsqlPgTsConfigCfgnamespace		INTEGER,
+		pgsqlPgTsConfigCfgowner		INTEGER,
+		pgsqlPgTsConfigCfgparser		INTEGER
+	}
+
+pgsqlPgTsConfigEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsConfigEntry 1 }
+
+pgsqlPgTsConfigCfgname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search configuration name"
+	::= { pgsqlPgTsConfigEntry 2 }
+
+pgsqlPgTsConfigCfgnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this configuration"
+	::= { pgsqlPgTsConfigEntry 3 }
+
+pgsqlPgTsConfigCfgowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the configuration"
+	::= { pgsqlPgTsConfigEntry 4 }
+
+pgsqlPgTsConfigCfgparser			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search parser for this configuration"
+	::= { pgsqlPgTsConfigEntry 5 }
+
+
+---------------------------------------
+pgsqlPgTsConfigMapTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsConfigMapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_config_map catalog contains entries showing which text search dictionaries should be consulted, and in what order, for each output token type of each text search configuration's parser."
+	::= { pgsqlCatalogTables 37 }
+
+pgsqlPgTsConfigMapEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsConfigMapEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_config_map entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsConfigMapEntryOID }
+	::= { pgsqlPgTsConfigMapTable 1 }
+
+PgsqlPgTsConfigMapEntry ::=
+	SEQUENCE {
+		pgsqlPgTsConfigMapEntryOID		INTEGER,
+		pgsqlPgTsConfigMapMapcfg		INTEGER,
+		pgsqlPgTsConfigMapMaptokentype		INTEGER,
+		pgsqlPgTsConfigMapMapseqno		INTEGER,
+		pgsqlPgTsConfigMapMapdict		INTEGER
+	}
+
+pgsqlPgTsConfigMapEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsConfigMapEntry 1 }
+
+pgsqlPgTsConfigMapMapcfg			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the pg_ts_config entry owning this map entry"
+	::= { pgsqlPgTsConfigMapEntry 2 }
+
+pgsqlPgTsConfigMapMaptokentype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A token type emitted by the configuration's parser"
+	::= { pgsqlPgTsConfigMapEntry 3 }
+
+pgsqlPgTsConfigMapMapseqno			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Order in which to consult this entry (lower mapseqnos first)"
+	::= { pgsqlPgTsConfigMapEntry 4 }
+
+pgsqlPgTsConfigMapMapdict			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search dictionary to consult"
+	::= { pgsqlPgTsConfigMapEntry 5 }
+
+
+---------------------------------------
+pgsqlPgTsDictTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsDictEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_dict catalog contains entries defining text search dictionaries. A dictionary depends on a text search template, which specifies all the implementation functions needed; the dictionary itself provides values for the user-settable parameters supported by the template. This division of labor allows dictionaries to be created by unprivileged users. The parameters are specified by a text string dictinitoption, whose format and meaning vary depending on the template."
+	::= { pgsqlCatalogTables 38 }
+
+pgsqlPgTsDictEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsDictEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_dict entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsDictEntryOID }
+	::= { pgsqlPgTsDictTable 1 }
+
+PgsqlPgTsDictEntry ::=
+	SEQUENCE {
+		pgsqlPgTsDictEntryOID		INTEGER,
+		pgsqlPgTsDictDictname		DisplayString ,
+		pgsqlPgTsDictDictnamespace		INTEGER,
+		pgsqlPgTsDictDictowner		INTEGER,
+		pgsqlPgTsDictDicttemplate		INTEGER,
+		pgsqlPgTsDictDictinitoption		DisplayString
+	}
+
+pgsqlPgTsDictEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsDictEntry 1 }
+
+pgsqlPgTsDictDictname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search dictionary name"
+	::= { pgsqlPgTsDictEntry 2 }
+
+pgsqlPgTsDictDictnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this dictionary"
+	::= { pgsqlPgTsDictEntry 3 }
+
+pgsqlPgTsDictDictowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the dictionary"
+	::= { pgsqlPgTsDictEntry 4 }
+
+pgsqlPgTsDictDicttemplate			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the text search template for this dictionary"
+	::= { pgsqlPgTsDictEntry 5 }
+
+pgsqlPgTsDictDictinitoption			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Initialization option string for the template"
+	::= { pgsqlPgTsDictEntry 6 }
+
+
+---------------------------------------
+pgsqlPgTsParserTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsParserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_parser catalog contains entries defining text search parsers. A parser is responsible for splitting input text into lexemes and assigning a token type to each lexeme. Since a parser must be implemented by C-language-level functions, creation of new parsers is restricted to database superusers."
+	::= { pgsqlCatalogTables 39 }
+
+pgsqlPgTsParserEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsParserEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_parser entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsParserEntryOID }
+	::= { pgsqlPgTsParserTable 1 }
+
+PgsqlPgTsParserEntry ::=
+	SEQUENCE {
+		pgsqlPgTsParserEntryOID		INTEGER,
+		pgsqlPgTsParserPrsname		DisplayString ,
+		pgsqlPgTsParserPrsnamespace		INTEGER,
+		pgsqlPgTsParserPrsstart		INTEGER,
+		pgsqlPgTsParserPrstoken		INTEGER,
+		pgsqlPgTsParserPrsend		INTEGER,
+		pgsqlPgTsParserPrsheadline		INTEGER,
+		pgsqlPgTsParserPrslextype		INTEGER
+	}
+
+pgsqlPgTsParserEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsParserEntry 1 }
+
+pgsqlPgTsParserPrsname			OBJECT-TYPE
+	SYNTAX		DisplayString 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Text search parser name"
+	::= { pgsqlPgTsParserEntry 2 }
+
+pgsqlPgTsParserPrsnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this parser"
+	::= { pgsqlPgTsParserEntry 3 }
+
+pgsqlPgTsParserPrsstart			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's startup function"
+	::= { pgsqlPgTsParserEntry 4 }
+
+pgsqlPgTsParserPrstoken			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's next-token function"
+	::= { pgsqlPgTsParserEntry 5 }
+
+pgsqlPgTsParserPrsend			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's shutdown function"
+	::= { pgsqlPgTsParserEntry 6 }
+
+pgsqlPgTsParserPrsheadline			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's headline function"
+	::= { pgsqlPgTsParserEntry 7 }
+
+pgsqlPgTsParserPrslextype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the parser's lextype function"
+	::= { pgsqlPgTsParserEntry 8 }
+
+
+---------------------------------------
+pgsqlPgTsTemplateTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTsTemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The pg_ts_template catalog contains entries defining text search templates. A template is the implementation skeleton for a class of text search dictionaries. Since a template must be implemented by C-language-level functions, creation of new templates is restricted to database superusers."
+	::= { pgsqlCatalogTables 40 }
+
+pgsqlPgTsTemplateEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTsTemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_ts_template entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTsTemplateEntryOID }
+	::= { pgsqlPgTsTemplateTable 1 }
+
+PgsqlPgTsTemplateEntry ::=
+	SEQUENCE {
+		pgsqlPgTsTemplateEntryOID		INTEGER,
+		pgsqlPgTsTemplateTmplname		DisplayString,
+		pgsqlPgTsTemplateTmplnamespace		INTEGER,
+		pgsqlPgTsTemplateTmplinit		INTEGER,
+		pgsqlPgTsTemplateTmpllexize		INTEGER
+	}
+
+pgsqlPgTsTemplateEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTsTemplateEntry 1 }
+
+pgsqlPgTsTemplateTmplname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" Text search template name"
+	::= { pgsqlPgTsTemplateEntry 2 }
+
+pgsqlPgTsTemplateTmplnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this template"
+	::= { pgsqlPgTsTemplateEntry 3 }
+
+pgsqlPgTsTemplateTmplinit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the template's initialization function"
+	::= { pgsqlPgTsTemplateEntry 4 }
+
+pgsqlPgTsTemplateTmpllexize			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the template's lexize function"
+	::= { pgsqlPgTsTemplateEntry 5 }
+
+
+---------------------------------------
+pgsqlPgTypeTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgTypeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_type stores information about data types. Base types (scalar types) are created with CREATE TYPE, and domains with CREATE DOMAIN. A composite type is automatically created for each table in the database, to represent the row structure of the table. It is also possible to create composite types with CREATE TYPE AS."
+	::= { pgsqlCatalogTables 33 }
+
+pgsqlPgTypeEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgTypeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single type"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgTypeEntryOID }
+	::= { pgsqlPgTypeTable 1 }
+
+PgsqlPgTypeEntry ::=
+	SEQUENCE {
+		pgsqlPgTypeEntryOID		INTEGER,
+		pgsqlPgTypeTypname		name,
+		pgsqlPgTypeTypnamespace		oid,
+		pgsqlPgTypeTypowner		oid,
+		pgsqlPgTypeTyplen		int2,
+		pgsqlPgTypeTypbyval		bool,
+		pgsqlPgTypeTyptype		char,
+		pgsqlPgTypeTypisdefined		bool,
+		pgsqlPgTypeTypdelim		char,
+		pgsqlPgTypeTyprelid		oid,
+		pgsqlPgTypeTypelem		oid,
+		pgsqlPgTypeTypinput		regproc,
+		pgsqlPgTypeTypoutput		regproc,
+		pgsqlPgTypeTypreceive		regproc,
+		pgsqlPgTypeTypsend		regproc,
+		pgsqlPgTypeTypanalyze		regproc,
+		pgsqlPgTypeTypalign		char,
+		pgsqlPgTypeTypstorage		char,
+		pgsqlPgTypeTypnotnull		bool,
+		pgsqlPgTypeTypbasetype		oid,
+		pgsqlPgTypeTyptypmod		int4,
+		pgsqlPgTypeTypndims		int4,
+		pgsqlPgTypeTypdefaultbin		text,
+		pgsqlPgTypeTypdefault		text
+	}
+
+pgsqlPgTypeEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgTypeEntry 1 }
+
+pgsqlPgTypeTypname			OBJECT-TYPE
+	SYNTAX		name
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type name"
+	::= { pgsqlPgTypeEntry 2 }
+
+pgsqlPgTypeTypnamespace			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The OID of the namespace that contains this type"
+	::= { pgsqlPgTypeEntry 3 }
+
+pgsqlPgTypeTypowner			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the type"
+	::= { pgsqlPgTypeEntry 4 }
+
+pgsqlPgTypeTyplen			OBJECT-TYPE
+	SYNTAX		int2
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For a fixed-size type, typlen is the number of bytes in the internal representation of the type. But for a variable-length type, typlen is negative. -1 indicates a "
+	::= { pgsqlPgTypeEntry 5 }
+
+pgsqlPgTypeTypbyval			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typbyval determines whether internal routines pass a value of this type by value or by reference. typbyval had better be false if typlen is not 1, 2, or 4 (or 8 on machines where Datum is 8 bytes). Variable-length types are always passed by reference. Note that typbyval can be false even if the length would allow pass-by-value; this is currently true for type float4 , for example"
+	::= { pgsqlPgTypeEntry 6 }
+
+pgsqlPgTypeTyptype			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typtype is b for a base type, c for a composite type (e.g., a table's row type), d for a domain, or p for a pseudo-type. See also typrelid and typbasetype"
+	::= { pgsqlPgTypeEntry 7 }
+
+pgsqlPgTypeTypisdefined			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if the type is defined, false if this is a placeholder entry for a not-yet-defined type. When typisdefined is false, nothing except the type name, namespace, and OID can be relied on"
+	::= { pgsqlPgTypeEntry 8 }
+
+pgsqlPgTypeTypdelim			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Character that separates two values of this type when parsing array input. Note that the delimiter is associated with the array element data type, not the array data type"
+	::= { pgsqlPgTypeEntry 9 }
+
+pgsqlPgTypeTyprelid			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is a composite type (see typtype ), then this column points to the pg_class entry that defines the corresponding table. (For a free-standing composite type, the pg_class entry doesn't really represent a table, but it is needed anyway for the type's pg_attribute entries to link to.) Zero for non-composite types"
+	::= { pgsqlPgTypeEntry 10 }
+
+pgsqlPgTypeTypelem			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If typelem is not 0 then it identifies another row in pg_type . The current type can then be subscripted like an array yielding values of type typelem . A "
+	::= { pgsqlPgTypeEntry 11 }
+
+pgsqlPgTypeTypinput			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Input conversion function (text format)"
+	::= { pgsqlPgTypeEntry 12 }
+
+pgsqlPgTypeTypoutput			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Output conversion function (text format)"
+	::= { pgsqlPgTypeEntry 13 }
+
+pgsqlPgTypeTypreceive			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Input conversion function (binary format), or 0 if none"
+	::= { pgsqlPgTypeEntry 14 }
+
+pgsqlPgTypeTypsend			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Output conversion function (binary format), or 0 if none"
+	::= { pgsqlPgTypeEntry 15 }
+
+pgsqlPgTypeTypanalyze			OBJECT-TYPE
+	SYNTAX		regproc
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Custom ANALYZE function, or 0 to use the standard function"
+	::= { pgsqlPgTypeEntry 16 }
+
+pgsqlPgTypeTypalign			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typalign is the alignment required when storing a value of this type. It applies to storage on disk as well as most representations of the value inside PostgreSQL . When multiple values are stored consecutively, such as in the representation of a complete row on disk, padding is inserted before a datum of this type so that it begins on the specified boundary. The alignment reference is the beginning of the first datum in the sequence. Possible values are: c = char alignment, i.e., no alignment needed. s = short alignment (2 bytes on most machines). i = int alignment (4 bytes on most machines). d = double alignment (8 bytes on many machines, but by no means all). Note: For types used in system tables, it is critical that the size and alignment defined in pg_type agree with the way that the compiler will lay out the column in a structure representing a table row."
+	::= { pgsqlPgTypeEntry 17 }
+
+pgsqlPgTypeTypstorage			OBJECT-TYPE
+	SYNTAX		char
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typstorage tells for varlena types (those with typlen = -1) if the type is prepared for toasting and what the default strategy for attributes of this type should be. Possible values are p : Value must always be stored plain. e : Value can be stored in a "
+	::= { pgsqlPgTypeEntry 18 }
+
+pgsqlPgTypeTypnotnull			OBJECT-TYPE
+	SYNTAX		bool
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typnotnull represents a not-null constraint on a type. Used for domains only"
+	::= { pgsqlPgTypeEntry 19 }
+
+pgsqlPgTypeTypbasetype			OBJECT-TYPE
+	SYNTAX		oid
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If this is a domain (see typtype ), then typbasetype identifies the type that this one is based on. Zero if this type is not a domain"
+	::= { pgsqlPgTypeEntry 20 }
+
+pgsqlPgTypeTyptypmod			OBJECT-TYPE
+	SYNTAX		int4
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Domains use typtypmod to record the typmod to be applied to their base type (-1 if base type does not use a typmod ). -1 if this type is not a domain"
+	::= { pgsqlPgTypeEntry 21 }
+
+pgsqlPgTypeTypndims			OBJECT-TYPE
+	SYNTAX		int4
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typndims is the number of array dimensions for a domain that is an array (that is, typbasetype is an array type; the domain's typelem will match the base type's typelem ). Zero for types other than array domains"
+	::= { pgsqlPgTypeEntry 22 }
+
+pgsqlPgTypeTypdefaultbin			OBJECT-TYPE
+	SYNTAX		text
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"If typdefaultbin is not null, it is the nodeToString() representation of a default expression for the type. This is only used for domains"
+	::= { pgsqlPgTypeEntry 23 }
+
+pgsqlPgTypeTypdefault			OBJECT-TYPE
+	SYNTAX		text
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"typdefault is null if the type has no associated default value. If typdefaultbin is not null, typdefault must contain a human-readable version of the default expression represented by typdefaultbin . If typdefaultbin is null and typdefault is not, then typdefault is the external representation of the type's default value, which may be fed to the type's input converter to produce a constant"
+	::= { pgsqlPgTypeEntry 24 }
+
+
+---------------------------------------
+END

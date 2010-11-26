@@ -1,0 +1,4 @@
+pg_inherits	"The catalog pg_inherits records information about table inheritance hierarchies. There is one entry for each direct child table in the database. (Indirect inheritance can be determined by following chains of entries.)"	"Represents an inheritance relationship"	pgsqlCatalogTables	18	"pgsnmpdConnID, rdbmsDbIndex, pgsqlPgInheritsInhrelid, pgsqlPgInheritsInhparent"
+inhrelid	INTEGER	"The OID of the child table"
+inhparent	INTEGER	"The OID of the parent table"
+inhseqno	INTEGER	"If there is more than one direct parent for a child table (multiple inheritance), this number tells the order in which the inherited columns are to be arranged. The count starts at 1"

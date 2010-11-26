@@ -1,0 +1,185 @@
+pgsqlPgAttributeTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAttributeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_attribute stores information about table columns. There will be exactly one pg_attribute row for every column in every table in the database. (There will also be attribute entries for indexes, and indeed all objects that have pg_class entries.) The term attribute is equivalent to column and is used for historical reasons."
+	::= { pgsqlCatalogTables 6 }
+
+pgsqlPgAttributeEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAttributeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_attribute entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAttributeEntryOID }
+	::= { pgsqlPgAttributeTable 1 }
+
+PgsqlPgAttributeEntry ::=
+	SEQUENCE {
+		pgsqlPgAttributeEntryOID		INTEGER,
+		pgsqlPgAttributeAttrelid		INTEGER,
+		pgsqlPgAttributeAttname		DisplayString,
+		pgsqlPgAttributeAtttypid		INTEGER,
+		pgsqlPgAttributeAttstattarget		INTEGER,
+		pgsqlPgAttributeAttlen		INTEGER,
+		pgsqlPgAttributeAttnum		INTEGER,
+		pgsqlPgAttributeAttndims		INTEGER,
+		pgsqlPgAttributeAttcacheoff		INTEGER,
+		pgsqlPgAttributeAtttypmod		INTEGER,
+		pgsqlPgAttributeAttbyval		TruthValue,
+		pgsqlPgAttributeAttstorage		DisplayString,
+		pgsqlPgAttributeAttalign		DisplayString,
+		pgsqlPgAttributeAttnotnull		TruthValue,
+		pgsqlPgAttributeAtthasdef		TruthValue,
+		pgsqlPgAttributeAttisdropped		TruthValue,
+		pgsqlPgAttributeAttislocal		INTEGER,
+		pgsqlPgAttributeAttinhcount		INTEGER
+	}
+
+pgsqlPgAttributeEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAttributeEntry 1 }
+
+pgsqlPgAttributeAttrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this column belongs to"
+	::= { pgsqlPgAttributeEntry 2 }
+
+pgsqlPgAttributeAttname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The column name"
+	::= { pgsqlPgAttributeEntry 3 }
+
+pgsqlPgAttributeAtttypid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The data type of this column"
+	::= { pgsqlPgAttributeEntry 4 }
+
+pgsqlPgAttributeAttstattarget			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"attstattarget controls the level of detail of statistics accumulated for this column by ANALYZE . A zero value indicates that no statistics should be collected. A negative value says to use the system default statistics target. The exact meaning of positive values is data type-dependent. For scalar data types, attstattarget is both the target number of "
+	::= { pgsqlPgAttributeEntry 5 }
+
+pgsqlPgAttributeAttlen			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typlen of this column's type"
+	::= { pgsqlPgAttributeEntry 6 }
+
+pgsqlPgAttributeAttnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the column. Ordinary columns are numbered from 1 up. System columns, such as oid , have (arbitrary) negative numbers"
+	::= { pgsqlPgAttributeEntry 7 }
+
+pgsqlPgAttributeAttndims			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of dimensions, if the column is an array type; otherwise 0. (Presently, the number of dimensions of an array is not enforced, so any nonzero value effectively means "
+	::= { pgsqlPgAttributeEntry 8 }
+
+pgsqlPgAttributeAttcacheoff			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Always -1 in storage, but when loaded into a row descriptor in memory this may be updated to cache the offset of the attribute within the row"
+	::= { pgsqlPgAttributeEntry 9 }
+
+pgsqlPgAttributeAtttypmod			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"atttypmod records type-specific data supplied at table creation time (for example, the maximum length of a varchar column). It is passed to type-specific input functions and length coercion functions. The value will generally be -1 for types that do not need atttypmod"
+	::= { pgsqlPgAttributeEntry 10 }
+
+pgsqlPgAttributeAttbyval			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typbyval of this column's type"
+	::= { pgsqlPgAttributeEntry 11 }
+
+pgsqlPgAttributeAttstorage			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Normally a copy of pg_type.typstorage of this column's type. For TOAST-able data types, this can be altered after column creation to control storage policy"
+	::= { pgsqlPgAttributeEntry 12 }
+
+pgsqlPgAttributeAttalign			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A copy of pg_type.typalign of this column's type"
+	::= { pgsqlPgAttributeEntry 13 }
+
+pgsqlPgAttributeAttnotnull			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This represents a not-null constraint. It is possible to change this column to enable or disable the constraint"
+	::= { pgsqlPgAttributeEntry 14 }
+
+pgsqlPgAttributeAtthasdef			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column has a default value, in which case there will be a corresponding entry in the pg_attrdef catalog that actually defines the value"
+	::= { pgsqlPgAttributeEntry 15 }
+
+pgsqlPgAttributeAttisdropped			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column has been dropped and is no longer valid. A dropped column is still physically present in the table, but is ignored by the parser and so cannot be accessed via SQL"
+	::= { pgsqlPgAttributeEntry 16 }
+
+pgsqlPgAttributeAttislocal			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This column is defined locally in the relation. Note that a column may be locally defined and inherited simultaneously"
+	::= { pgsqlPgAttributeEntry 17 }
+
+pgsqlPgAttributeAttinhcount			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of direct ancestors this column has. A column with a nonzero number of ancestors cannot be dropped nor renamed"
+	::= { pgsqlPgAttributeEntry 18 }
+
+
+---------------------------------------

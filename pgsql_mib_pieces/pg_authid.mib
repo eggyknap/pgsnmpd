@@ -1,0 +1,132 @@
+-- TODO: Because pg_authid is shared across databases, find a way to ensure I cover all configured connections exactly once
+pgsqlPgAuthidTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAuthidEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_authid contains information about database authorization identifiers (roles). A role subsumes the concepts of 'users' and 'groups'. A user is essentially just a role with the rolcanlogin flag set. Any role (with or without rolcanlogin) may have other roles as members; see pg_auth_members. Since this catalog contains passwords, it must not be publicly readable. pg_roles is a publicly readable view on pg_authid that blanks out the password field. Because user identities are cluster-wide, pg_authid is shared across all databases of a cluster: there is only one copy of pg_authid per cluster, not one per database."
+	::= { pgsqlCatalogTables 7 }
+
+pgsqlPgAuthidEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAuthidEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_authid entry"
+	INDEX  { pgsnmpdConnID, pgsqlPgAuthidEntryOID }
+	::= { pgsqlPgAuthidTable 1 }
+
+PgsqlPgAuthidEntry ::=
+	SEQUENCE {
+		pgsqlPgAuthidEntryOID		INTEGER,
+		pgsqlPgAuthidRolname		INTEGER,
+		pgsqlPgAuthidRolsuper		TruthValue,
+		pgsqlPgAuthidRolinherit		TruthValue,
+		pgsqlPgAuthidRolcreaterole		TruthValue,
+		pgsqlPgAuthidRolcreatedb		TruthValue,
+		pgsqlPgAuthidRolcatupdate		TruthValue,
+		pgsqlPgAuthidRolcanlogin		TruthValue,
+		pgsqlPgAuthidRolconnlimit		INTEGER,
+		pgsqlPgAuthidRolpassword		DisplayString,
+		pgsqlPgAuthidRolvaliduntil		DateAndTime,
+		pgsqlPgAuthidRolconfig		DisplayString
+	}
+
+pgsqlPgAuthidEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAuthidEntry 1 }
+
+pgsqlPgAuthidRolname			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role name"
+	::= { pgsqlPgAuthidEntry 2 }
+
+pgsqlPgAuthidRolsuper			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role has superuser privileges"
+	::= { pgsqlPgAuthidEntry 3 }
+
+pgsqlPgAuthidRolinherit			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role automatically inherits privileges of roles it is a member of"
+	::= { pgsqlPgAuthidEntry 4 }
+
+pgsqlPgAuthidRolcreaterole			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may create more roles"
+	::= { pgsqlPgAuthidEntry 5 }
+
+pgsqlPgAuthidRolcreatedb			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may create databases"
+	::= { pgsqlPgAuthidEntry 6 }
+
+pgsqlPgAuthidRolcatupdate			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may update system catalogs directly. (Even a superuser may not do this unless this column is true)"
+	::= { pgsqlPgAuthidEntry 7 }
+
+pgsqlPgAuthidRolcanlogin			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Role may log in. That is, this role can be given as the initial session authorization identifier"
+	::= { pgsqlPgAuthidEntry 8 }
+
+pgsqlPgAuthidRolconnlimit			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For roles that can log in, this sets maximum number of concurrent connections this role can make. -1 means no limit"
+	::= { pgsqlPgAuthidEntry 9 }
+
+pgsqlPgAuthidRolpassword			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Password (possibly encrypted); NULL if none"
+	::= { pgsqlPgAuthidEntry 10 }
+
+pgsqlPgAuthidRolvaliduntil			OBJECT-TYPE
+	SYNTAX		DateAndTime
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Password expiry time (only used for password authentication); NULL if no expiration"
+	::= { pgsqlPgAuthidEntry 11 }
+
+pgsqlPgAuthidRolconfig			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Session defaults for run-time configuration variables"
+	::= { pgsqlPgAuthidEntry 12 }
+
+
+---------------------------------------

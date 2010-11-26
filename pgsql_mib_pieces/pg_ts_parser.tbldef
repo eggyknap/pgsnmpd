@@ -1,0 +1,9 @@
+pg_ts_parser	"The pg_ts_parser catalog contains entries defining text search parsers. A parser is responsible for splitting input text into lexemes and assigning a token type to each lexeme. Since a parser must be implemented by C-language-level functions, creation of new parsers is restricted to database superusers."	"pg_ts_parser entry"	pgsqlCatalogTables	39	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+prsname	DisplayString 	Text search parser name
+prsnamespace	INTEGER	The OID of the namespace that contains this parser
+prsstart	INTEGER	OID of the parser's startup function
+prstoken	INTEGER	OID of the parser's next-token function
+prsend	INTEGER	OID of the parser's shutdown function
+prsheadline	INTEGER	OID of the parser's headline function
+prslextype	INTEGER	OID of the parser's lextype function

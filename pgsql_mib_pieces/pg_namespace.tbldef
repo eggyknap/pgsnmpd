@@ -1,0 +1,5 @@
+pg_namespace	"The catalog pg_namespace stores namespaces. A namespace is the structure underlying SQL schemas: each namespace can have a separate collection of relations, types, etc. without name conflicts."	"Represents a single namespace"	pgsqlCatalogTables	22	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+nspname	DisplayString	"Name of the namespace"
+nspowner	INTEGER	"Owner of the namespace"
+nspacl	DisplayString	"Access privileges; see GRANT and REVOKE for details"

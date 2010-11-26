@@ -1,0 +1,95 @@
+pgsqlPgOpclassTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgOpclassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_opclass defines index access method operator classes. Each operator class defines semantics for index columns of a particular data type and a particular index access method. Note that there can be multiple operator classes for a given data type/access method combination, thus supporting multiple behaviors."
+	::= { pgsqlCatalogTables 23 }
+
+pgsqlPgOpclassEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgOpclassEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents an index access method operator class"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgOpclassEntryOID }
+	::= { pgsqlPgOpclassTable 1 }
+
+PgsqlPgOpclassEntry ::=
+	SEQUENCE {
+		pgsqlPgOpclassEntryOID		INTEGER,
+		pgsqlPgOpclassOpcamid		INTEGER,
+		pgsqlPgOpclassOpcname		DisplayString,
+		pgsqlPgOpclassOpcnamespace		INTEGER,
+		pgsqlPgOpclassOpcowner		INTEGER,
+		pgsqlPgOpclassOpcintype		INTEGER,
+		pgsqlPgOpclassOpcdefault		TruthValue,
+		pgsqlPgOpclassOpckeytype		INTEGER
+	}
+
+pgsqlPgOpclassEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgOpclassEntry 1 }
+
+pgsqlPgOpclassOpcamid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Index access method operator class is for"
+	::= { pgsqlPgOpclassEntry 2 }
+
+pgsqlPgOpclassOpcname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of this operator class"
+	::= { pgsqlPgOpclassEntry 3 }
+
+pgsqlPgOpclassOpcnamespace			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Namespace of this operator class"
+	::= { pgsqlPgOpclassEntry 4 }
+
+pgsqlPgOpclassOpcowner			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Owner of the operator class"
+	::= { pgsqlPgOpclassEntry 5 }
+
+pgsqlPgOpclassOpcintype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Data type that the operator class indexes"
+	::= { pgsqlPgOpclassEntry 6 }
+
+pgsqlPgOpclassOpcdefault			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this operator class is the default for opcintype"
+	::= { pgsqlPgOpclassEntry 7 }
+
+pgsqlPgOpclassOpckeytype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Type of data stored in index, or zero if same as opcintype"
+	::= { pgsqlPgOpclassEntry 8 }
+
+
+---------------------------------------

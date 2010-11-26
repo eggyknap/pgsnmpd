@@ -1,0 +1,6 @@
+pg_ts_config	"The pg_ts_config catalog contains entries representing text search configurations. A configuration specifies a particular text search parser and a list of dictionaries to use for each of the parser's output token types. The parser is shown in the pg_ts_config entry, but the token-to-dictionary mapping is defined by subsidiary entries in pg_ts_config_map."	"pg_ts_config entry"	pgsqlCatalogTables	36	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+cfgname	DisplayString 	Text search configuration name
+cfgnamespace	INTEGER	The OID of the namespace that contains this configuration
+cfgowner	INTEGER	Owner of the configuration
+cfgparser	INTEGER	The OID of the text search parser for this configuration

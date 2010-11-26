@@ -1,0 +1,68 @@
+pgsqlPgAmprocTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAmprocEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_amproc stores information about support procedures associated with index access method operator classes. There is one row for each support procedure belonging to an operator class."
+	::= { pgsqlCatalogTables 4 }
+
+pgsqlPgAmprocEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAmprocEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_amproc entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAmprocEntryOID }
+	::= { pgsqlPgAmprocTable 1 }
+
+PgsqlPgAmprocEntry ::=
+	SEQUENCE {
+		pgsqlPgAmprocEntryOID		INTEGER,
+		pgsqlPgAmprocAmopclaid		INTEGER,
+		pgsqlPgAmprocAmprocsubtype		INTEGER,
+		pgsqlPgAmprocAmprocnum		INTEGER,
+		pgsqlPgAmprocAmproc		INTEGER
+	}
+
+pgsqlPgAmprocEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAmprocEntry 1 }
+
+pgsqlPgAmprocAmopclaid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The index operator class this entry is for"
+	::= { pgsqlPgAmprocEntry 2 }
+
+pgsqlPgAmprocAmprocsubtype			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Subtype, if cross-type routine, else zero"
+	::= { pgsqlPgAmprocEntry 3 }
+
+pgsqlPgAmprocAmprocnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Support procedure number"
+	::= { pgsqlPgAmprocEntry 4 }
+
+pgsqlPgAmprocAmproc			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"OID of the procedure"
+	::= { pgsqlPgAmprocEntry 5 }
+
+
+---------------------------------------

@@ -1,0 +1,86 @@
+pgsqlPgLanguageTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgLanguageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_language registers languages in which you can write functions or stored procedures."
+	::= { pgsqlCatalogTables 19 }
+
+pgsqlPgLanguageEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgLanguageEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a single language"
+	INDEX  { entryID, rdbmsDbIndex, pgsqlPgLanguageEntryOID }
+	::= { pgsqlPgLanguageTable 1 }
+
+PgsqlPgLanguageEntry ::=
+	SEQUENCE {
+		pgsqlPgLanguageEntryOID		INTEGER,
+		pgsqlPgLanguageLanname		DisplayString,
+		pgsqlPgLanguageLanispl		TruthValue,
+		pgsqlPgLanguageLanpltrusted		TruthValue,
+		pgsqlPgLanguageLanplcallfoid		INTEGER,
+		pgsqlPgLanguageLanvalidator		INTEGER,
+		pgsqlPgLanguageLanacl		DisplayString
+	}
+
+pgsqlPgLanguageEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgLanguageEntry 1 }
+
+pgsqlPgLanguageLanname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the language"
+	::= { pgsqlPgLanguageEntry 2 }
+
+pgsqlPgLanguageLanispl			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is false for internal languages (such as SQL ) and true for user-defined languages. Currently, pg_dump still uses this to determine which languages need to be dumped, but this may be replaced by a different mechanism in the future"
+	::= { pgsqlPgLanguageEntry 3 }
+
+pgsqlPgLanguageLanpltrusted			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if this is a trusted language, which means that it is believed not to grant access to anything outside the normal SQL execution environment. Only superusers may create functions in untrusted languages"
+	::= { pgsqlPgLanguageEntry 4 }
+
+pgsqlPgLanguageLanplcallfoid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"For noninternal languages this references the language handler, which is a special function that is responsible for executing all functions that are written in the particular language"
+	::= { pgsqlPgLanguageEntry 5 }
+
+pgsqlPgLanguageLanvalidator			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This references a language validator function that is responsible for checking the syntax and validity of new functions when they are created. Zero if no validator is provided"
+	::= { pgsqlPgLanguageEntry 6 }
+
+pgsqlPgLanguageLanacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges; see GRANT and REVOKE for details"
+	::= { pgsqlPgLanguageEntry 7 }
+
+
+---------------------------------------

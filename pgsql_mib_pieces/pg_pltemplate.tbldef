@@ -1,0 +1,7 @@
+pg_pltemplate	"The catalog pg_pltemplate stores 'template' information for procedural languages. A template for a language allows the language to be created in a particular database by a simple CREATE LANGUAGE command, with no need to specify implementation details. Unlike most system catalogs, pg_pltemplate is shared across all databases of a cluster: there is only one copy of pg_pltemplate per cluster, not one per database. This allows the information to be accessible in each database as it is needed."	"Represents a procedural language template"	pgsqlCatalogTables	25	"pgsnmpdConnID, rdbmsDbIndex, pgsqlPgPltemplateTmplname"
+tmplname	DisplayString	"Name of the language this template is for"
+tmpltrusted	TruthValue	"True if language is considered trusted"
+tmplhandler	DisplayString	"Name of call handler function"
+tmplvalidator	DisplayString	"Name of validator function, or NULL if none"
+tmpllibrary	DisplayString	"Path of shared library that implements language"
+tmplacl	DisplayString	"Access privileges for template (not yet used)"

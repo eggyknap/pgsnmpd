@@ -1,0 +1,86 @@
+pgsqlPgPltemplateTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgPltemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_pltemplate stores 'template' information for procedural languages. A template for a language allows the language to be created in a particular database by a simple CREATE LANGUAGE command, with no need to specify implementation details. Unlike most system catalogs, pg_pltemplate is shared across all databases of a cluster: there is only one copy of pg_pltemplate per cluster, not one per database. This allows the information to be accessible in each database as it is needed."
+	::= { pgsqlCatalogTables 25 }
+
+pgsqlPgPltemplateEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgPltemplateEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Represents a procedural language template"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgPltemplateEntryOID }
+	::= { pgsqlPgPltemplateTable 1 }
+
+PgsqlPgPltemplateEntry ::=
+	SEQUENCE {
+		pgsqlPgPltemplateEntryOID		INTEGER,
+		pgsqlPgPltemplateTmplname		DisplayString,
+		pgsqlPgPltemplateTmpltrusted		TruthValue,
+		pgsqlPgPltemplateTmplhandler		DisplayString,
+		pgsqlPgPltemplateTmplvalidator		DisplayString,
+		pgsqlPgPltemplateTmpllibrary		DisplayString,
+		pgsqlPgPltemplateTmplacl		DisplayString
+	}
+
+pgsqlPgPltemplateEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgPltemplateEntry 1 }
+
+pgsqlPgPltemplateTmplname			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of the language this template is for"
+	::= { pgsqlPgPltemplateEntry 2 }
+
+pgsqlPgPltemplateTmpltrusted			OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if language is considered trusted"
+	::= { pgsqlPgPltemplateEntry 3 }
+
+pgsqlPgPltemplateTmplhandler			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of call handler function"
+	::= { pgsqlPgPltemplateEntry 4 }
+
+pgsqlPgPltemplateTmplvalidator			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Name of validator function, or NULL if none"
+	::= { pgsqlPgPltemplateEntry 5 }
+
+pgsqlPgPltemplateTmpllibrary			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Path of shared library that implements language"
+	::= { pgsqlPgPltemplateEntry 6 }
+
+pgsqlPgPltemplateTmplacl			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Access privileges for template (not yet used)"
+	::= { pgsqlPgPltemplateEntry 7 }
+
+
+---------------------------------------

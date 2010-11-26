@@ -1,0 +1,9 @@
+pg_conversion	"The catalog pg_conversion describes the available encoding conversion procedures."	"A conversion entry"	pgsqlCatalogTables	13	"pgsnmpdConnID, rdbmsDbIndex, entryOID"
+"entryOID"	"INTEGER"	"OID of this entry"	1	not-accessible
+conname	DisplayString	"Conversion name (unique within a namespace)"
+connamespace	INTEGER	"The OID of the namespace that contains this conversion"
+conowner	INTEGER	"Owner of the conversion"
+conforencoding	INTEGER	"Source encoding ID"
+contoencoding	INTEGER	"Destination encoding ID"
+conproc	INTEGER	"Conversion procedure"
+condefault	TruthValue	"True if this is the default conversion"

@@ -1,0 +1,68 @@
+pgsqlPgAttrdefTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pgsqlPgAttrdefEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The catalog pg_attrdef stores column default values. The main information about columns is stored in pg_attribute (see below). Only columns that explicitly specify a default value (when the table is created or the column is added) will have an entry here."
+	::= { pgsqlCatalogTables 5 }
+
+pgsqlPgAttrdefEntry		OBJECT-TYPE
+	SYNTAX		PgsqlPgAttrdefEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"pg_attrdef entry"
+	INDEX  { pgsnmpdConnID, rdbmsDbIndex, pgsqlPgAttrdefEntryOID }
+	::= { pgsqlPgAttrdefTable 1 }
+
+PgsqlPgAttrdefEntry ::=
+	SEQUENCE {
+		pgsqlPgAttrdefEntryOID		INTEGER,
+		pgsqlPgAttrdefAdrelid		INTEGER,
+		pgsqlPgAttrdefAdnum		INTEGER,
+		pgsqlPgAttrdefAdbin		DisplayString,
+		pgsqlPgAttrdefAdsrc		DisplayString
+	}
+
+pgsqlPgAttrdefEntryOID			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"OID of this entry"
+	::= { pgsqlPgAttrdefEntry 1 }
+
+pgsqlPgAttrdefAdrelid			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The table this column belongs to"
+	::= { pgsqlPgAttrdefEntry 2 }
+
+pgsqlPgAttrdefAdnum			OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of the column"
+	::= { pgsqlPgAttrdefEntry 3 }
+
+pgsqlPgAttrdefAdbin			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The internal representation of the column default value"
+	::= { pgsqlPgAttrdefEntry 4 }
+
+pgsqlPgAttrdefAdsrc			OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A human-readable representation of the default value"
+	::= { pgsqlPgAttrdefEntry 5 }
+
+
+---------------------------------------
